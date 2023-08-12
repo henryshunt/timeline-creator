@@ -5,6 +5,10 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <Title>Timeline Creator</Title>
+    <Authors>Henry Hunt</Authors>
+    <Product>Timeline Creator</Product>
+    <Copyright>Copyright © Henry Hunt 2023</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

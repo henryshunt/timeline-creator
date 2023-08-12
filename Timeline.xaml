@@ -1,8 +1,8 @@
-﻿<UserControl x:Class="TimelineRenderer.Timeline"
+﻿<UserControl x:Class="TimelineCreator.Timeline"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              
-             Loaded="UserControl_Loaded" SizeChanged="UserControl_SizeChanged" MouseWheel="UserControl_MouseWheel">
+             Loaded="UserControl_Loaded" SizeChanged="UserControl_SizeChanged" MouseWheel="UserControl_MouseWheel" MouseDown="UserControl_MouseDown" MouseUp="UserControl_MouseUp" MouseMove="UserControl_MouseMove" Background="White">
 
-    <Canvas x:Name="theCanvas" MouseDown="TheCanvas_MouseDown" MouseUp="TheCanvas_MouseUp" MouseMove="TheCanvas_MouseMove" Background="White"/>
+    <Grid x:Name="theGrid" Background="White" MaxWidth="{Binding MaxTimelineWidth}" HorizontalAlignment="Stretch" SnapsToDevicePixels="True"/>
 </UserControl>

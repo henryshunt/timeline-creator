@@ -1,34 +1,43 @@
-﻿<Window x:Class="TimelineRenderer.MainWindow"
+﻿<Window x:Class="TimelineCreator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:TimelineRenderer"
+        xmlns:local="clr-namespace:TimelineCreator"
         
-        Title="Starship Tanking Timeline" Height="450" Width="800" WindowState="Maximized" Loaded="Window_Loaded">
+        Title="Timeline Renderer" Height="500" Width="800" WindowState="Maximized" Loaded="Window_Loaded" KeyDown="Window_KeyDown" Closing="Window_Closing">
+
+    <Window.Resources>
+        <ContextMenu x:Key="tabContextMenu">
+            <MenuItem Header="Close Tab" Click="CloseTabMenu_Click"/>
+        </ContextMenu>
+    </Window.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+        <TabControl x:Name="theTabControl" Style="{DynamicResource TabControlStyle1}" Grid.Column="1" BorderThickness="0,0,0,1" SelectionChanged="TheTabControl_SelectionChanged" TabStripPlacement="Bottom"/>
 
-        <Grid Background="#FFE5E5E5">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="10" HorizontalAlignment="Center">
-                <Button Content="New Timeline" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="NewTimelineButton_Click"/>
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="New" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="NewButton_Click"/>
                 <Button Content="Open" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="OpenButton_Click"/>
                 <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="SaveButton_Click"/>
-                <Button Content="Reset Zoom" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0" Click="ResetZoomButton_Click"/>
+                <Button Content="Add Item" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="AddItemButton_Click"/>
+                <Button Content="Reset Zoom" HorizontalAlignment="Left" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="ResetZoomButton_Click"/>
+                <Button Content="Close Tab" Padding="8,0,8,2" Height="26" Click="CloseTabButton_Click"/>
             </StackPanel>
 
-            <StackPanel Margin="0,46,0,0">
-                <Expander Style="{DynamicResource ExpanderStyle1}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="Document" Background="SlateGray" IsExpanded="True" BorderThickness="0">
-                    <Border Background="#FFE5E5E5" Padding="10">
+            <StackPanel Margin="0,10,0,0">
+                <Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0">
+                    <Expander.Header>
+                        <TextBlock Text="Document Properties" FontWeight="Bold" Margin="0,-1,0,0"/>
+                    </Expander.Header>
+
+                    <Border Background="White" Padding="0,10,0,0">
                         <StackPanel VerticalAlignment="Top">
                             <Grid VerticalAlignment="Top">
                                 <TextBlock Text="Title:" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                <TextBox x:Name="docTitleTextBox" Padding="5,3,5,0" Margin="30,0,0,0" TextChanged="DocTitleTextBox_TextChanged" Height="26"/>
+                                <TextBox x:Name="docTitleTextBox" Padding="5,3,5,0" Margin="30,0,0,0" Height="26"/>
                             </Grid>
 
-                            <TextBox x:Name="docDescripTextBox" Padding="5,3,5,0" Margin="0,5,0,5" Height="100" VerticalAlignment="Top" TextChanged="DocDescripTextBox_TextChanged" AcceptsReturn="True"/>
+                            <TextBox x:Name="docDescripTextBox" Padding="5,3,5,0" Margin="0,5,0,5" Height="200" VerticalAlignment="Top" AcceptsReturn="True" TextWrapping="Wrap"/>
 
                             <Grid VerticalAlignment="Top">
                                 <TextBlock Text="Time Zone:" VerticalAlignment="Center" HorizontalAlignment="Left"/>
@@ -38,40 +47,50 @@
                     </Border>
                 </Expander>
 
-                <Expander Style="{DynamicResource ExpanderStyle1}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="Add Timeline Item" Background="SlateGray" IsExpanded="True" BorderThickness="0">
+                <!--<Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0">
+                    <Expander.Header>
+                        <TextBlock Text="Add Timeline Item" FontWeight="Bold" Margin="0,-1,0,0"/>
+                    </Expander.Header>
+
                     <Border Background="#FFE5E5E5" Padding="10">
                         <StackPanel>
                             <Grid VerticalAlignment="Top">
-                                <CheckBox x:Name="addApproxCheckBox" Content="Approximate" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <TextBox x:Name="addTimeTextBox" TextAlignment="Center" Padding="5,3,5,0" TextChanged="AddTimeTextBox_TextChanged" Margin="98,0,48,0"/>
-                                <Button x:Name="addNowButton" Content="Now" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="AddNowButton_Click"/>
+                                <TextBox x:Name="addTimeTextBox" TextAlignment="Center" Padding="5,3,5,0" TextChanged="AddTimeTextBox_TextChanged" Margin="0,0,48,0" PreviewKeyDown="AddTextBox_PreviewKeyDown"/>
+                                <Button Content="Now" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="AddNowButton_Click"/>
                             </Grid>
 
-                            <TextBox x:Name="addTextTextBox" Padding="5,3,5,0" Margin="0,5,0,5" PreviewKeyDown="AddTextTextBox_PreviewKeyDown" Height="100"/>
-                            <Button x:Name="addAddButton" Content="Add to Timeline" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="AddAddButton_Click" IsEnabled="False"/>
+                            <TextBox x:Name="addTextTextBox" Padding="5,3,5,0" Margin="0,5,0,5" PreviewKeyDown="AddTextBox_PreviewKeyDown" Height="100" TextWrapping="Wrap"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="tZeroButton" Content="Add to Timeline (T-0)" Padding="8,0,8,2" Height="26" Margin="0,0,5,0" Click="tZeroButton_Click"/>
+                                <Button x:Name="addItemButton" Content="Add to Timeline" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="AddItemButton_Click" IsEnabled="False"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
-                </Expander>
+                </Expander>-->
 
-                <Expander x:Name="editExpander" Style="{DynamicResource ExpanderStyle1}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="Edit Timeline Item" Background="SlateGray" IsExpanded="False" BorderThickness="0">
+                <!--<Expander x:Name="editExpander" Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="False" BorderThickness="0">
+                    <Expander.Header>
+                        <TextBlock Text="Edit Timeline Item" FontWeight="Bold" Margin="0,-1,0,0"/>
+                    </Expander.Header>
+
                     <Border Background="#FFE5E5E5" Padding="10">
                         <StackPanel>
                             <Grid VerticalAlignment="Top">
-                                <CheckBox x:Name="editApproxCheckBox" Content="Approximate" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                                <TextBox x:Name="editTimeTextBox" TextAlignment="Center" Padding="5,3,5,0" TextChanged="EditTimeTextBox_TextChanged" Margin="98,0,48,0"/>
-                                <Button x:Name="editNowButton" Content="Now" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="EditNowButton_Click"/>
+                                <TextBox x:Name="editTimeTextBox" TextAlignment="Center" Padding="5,3,5,0" TextChanged="EditTimeTextBox_TextChanged" Margin="0,0,48,0" PreviewKeyDown="EditTextBox_PreviewKeyDown"/>
+                                <Button Content="Now" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="EditNowButton_Click"/>
                             </Grid>
 
-                            <TextBox x:Name="editTextTextBox" Padding="5,3,5,0" Margin="0,5,0,5" PreviewKeyDown="EditTextTextBox_PreviewKeyDown" Height="100"/>
-                            <Button x:Name="editSaveButton" Content="Save Item" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="EditSaveButton_Click" IsEnabled="False"/>
+                            <TextBox x:Name="editTextTextBox" Padding="5,3,5,0" Margin="0,5,0,5" PreviewKeyDown="EditTextBox_PreviewKeyDown" Height="100" TextWrapping="Wrap"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="saveItemButton" Content="Save" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="SaveItemButton_Click" IsEnabled="False" Margin="0,0,5,0"/>
+                                <Button Content="Remove" HorizontalAlignment="Right" Padding="8,0,8,2" Height="26" Click="DeleteItemButton_Click"/>
+                            </StackPanel>
                         </StackPanel>
                     </Border>
-                </Expander>
+                </Expander>-->
             </StackPanel>
-        </Grid>
-
-        <Grid MaxWidth="600" Panel.ZIndex="-1" Grid.Column="1">
-            <local:Timeline x:Name="theTimeline" Margin="10,10,10,10" SnapsToDevicePixels="True" ItemSelected="TheTimeline_ItemSelected" FontSize="14"/>
-        </Grid>
+        </StackPanel>
     </Grid>
 </Window>
