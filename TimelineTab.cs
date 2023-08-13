@@ -95,7 +95,12 @@ namespace TimelineCreator
 
         private TimelineTab(bool isFromFile)
         {
-            Timeline = new Timeline() { Margin = new Thickness(10), FontSize = 14 };
+            Timeline = new Timeline()
+            {
+                Margin = new Thickness(10),
+                FontSize = 14,
+                TimelineWidth = 30
+            };
 
             if (!isFromFile)
                 Timeline.Items.CollectionChanged += Items_CollectionChanged;

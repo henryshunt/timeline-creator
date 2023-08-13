@@ -4,5 +4,5 @@
              
              Loaded="UserControl_Loaded" SizeChanged="UserControl_SizeChanged" MouseWheel="UserControl_MouseWheel" MouseDown="UserControl_MouseDown" MouseUp="UserControl_MouseUp" MouseMove="UserControl_MouseMove" Background="White">
 
-    <Grid x:Name="theGrid" Background="White" MaxWidth="{Binding MaxTimelineWidth}" HorizontalAlignment="Stretch" SnapsToDevicePixels="True"/>
+    <Grid x:Name="theGrid" Background="White" HorizontalAlignment="Stretch" SnapsToDevicePixels="True"/>
 </UserControl>

@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,10 +18,18 @@ namespace TimelineCreator
             InitializeComponent();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             timeZoneComboBox.ItemsSource = TimeZoneInfo.GetSystemTimeZones();
             timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
+
+            //TimelineTab tab = TimelineTab.OpenDocument(@"C:\Users\Henry\Starship OFT Timeline 2023-04-20.json");
+            //tab.ContextMenu = Resources["tabContextMenu"] as ContextMenu;
+            //theTabControl.Items.Add(tab);
+
+            await Task.Delay(0); // Hack, otherwise the new document won't render
+
+            theTabControl.Items.Add(TimelineTab.NewDocument());
 
             //TimelineTab document = TimelineTab.NewDocument();
             //document.Timeline.Items.Add(new TimelineItem() { DateTime = new DateTime(2023, 7, 13, 0, 0, 0) });
@@ -28,11 +37,6 @@ namespace TimelineCreator
             //document.Timeline.Items.Add(new TimelineItem() { DateTime = new DateTime(2023, 7, 14, 0, 0, 0) });
             //theTabControl.Items.Add(document);
 
-            //TimelineTab tab = TimelineTab.OpenDocument(@"C:\Users\Henry\Starship OFT Timeline 2023-04-20.json");
-            //tab.ContextMenu = Resources["tabContextMenu"] as ContextMenu;
-            //theTabControl.Items.Add(tab);
-
-            theTabControl.Items.Add(TimelineTab.NewDocument());
             theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
         }
 
@@ -58,17 +62,11 @@ namespace TimelineCreator
             if (e.IsRepeat == false)
             {
                 if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
-                {
                     NewButton_Click(this, new RoutedEventArgs());
-                }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.O)
-                {
                     OpenButton_Click(this, new RoutedEventArgs());
-                }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
-                {
                     SaveButton_Click(this, new RoutedEventArgs());
-                }
                 else if (e.Key == Key.Escape)
                 {
                     if (selectedTab?.Timeline.SelectedItem != null)
@@ -80,9 +78,7 @@ namespace TimelineCreator
                         selectedTab.Timeline.Items.Remove(selectedTab.Timeline.SelectedItem);
                 }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0)
-                {
                     selectedTab?.Timeline.ResetZoom();
-                }
             }
         }
 
@@ -300,6 +296,16 @@ namespace TimelineCreator
         {
             if (selectedTab != null)
                 selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
+        }
+
+        private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (selectedTab != null)
+            {
+                int percentage = (int)Math.Round(((Slider)sender).Value);
+                widthLabel.Text = percentage + "%";
+                selectedTab.Timeline.TimelineWidth = percentage;
+            }
         }
     }
 }

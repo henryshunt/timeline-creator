@@ -21,7 +21,24 @@ namespace TimelineCreator
         private const double LEFT_PADDING = 130;
         private const double START_END_PADDING = 15;
 
-        public double MaxTimelineWidth { get; set; } = 800;
+
+        private int timelineWidth = 100;
+
+        /// <summary>
+        /// Percentage of the width of the control that the timeline itself takes up.
+        /// </summary>
+        public int TimelineWidth
+        {
+            get { return timelineWidth; }
+
+            set
+            {
+                timelineWidth = value;
+                theGrid.MaxWidth = CalcTimelineWidthFromPct();
+                Render(false);
+            }
+        }
+
         public readonly ObservableCollection<TimelineItem> Items = new();
 
         private TimelineItem? selectedItem = null;
@@ -74,13 +91,12 @@ namespace TimelineCreator
         public Timeline()
         {
             InitializeComponent();
-            DataContext = this;
-
             Items.CollectionChanged += Items_CollectionChanged;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            theGrid.MaxWidth = CalcTimelineWidthFromPct();
             //Render(true);
         }
 
@@ -91,14 +107,7 @@ namespace TimelineCreator
 
         private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (e.Delta > 0)
-            {
-                Zoom(15, e.GetPosition(theGrid).Y);
-            }
-            else
-            {
-                Zoom(-15, e.GetPosition(theGrid).Y);
-            }
+            Zoom(e.Delta > 0 ? 15 : -15, e.GetPosition(theGrid).Y);
         }
 
         private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -110,23 +119,16 @@ namespace TimelineCreator
                     TimelineItem item = (TimelineItem)e.NewItems![0]!;
 
                     if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
-                    {
                         Render(false);
-                    }
                 }
-                else
-                {
-                    Render(true);
-                }
+                else Render(true);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 if (SelectedItem != null && e.OldItems!.Contains(SelectedItem))
                 {
                     if (SelectedItem.DateTime >= viewStartTime && SelectedItem.DateTime <= viewEndTime)
-                    {
                         Render(false);
-                    }
 
                     SelectedItem = null;
                 }
@@ -134,7 +136,10 @@ namespace TimelineCreator
         }
 
         #region Rendering
-        public void Render(bool zoomToFit)
+        /// <summary>
+        /// Renders the entire timeline after clearing everything from the container.
+        /// </summary>
+        private void Render(bool zoomToFit)
         {
             theGrid.Children.Clear();
 
@@ -154,9 +159,7 @@ namespace TimelineCreator
 
                 secondsPerPixel = 0;
                 if (viewHeight > 0 && viewSeconds > 0)
-                {
                     secondsPerPixel = viewSeconds / viewHeight;
-                }
 
                 if (!DesignerProperties.GetIsInDesignMode(this))
                 {
@@ -166,17 +169,15 @@ namespace TimelineCreator
             }
         }
 
+        /// <summary>
+        /// Renders the actual line of the timeline.
+        /// </summary>
         private void RenderTimelineLine()
         {
             double xPosition;
-            if (theGrid.ActualWidth <= MaxTimelineWidth)
-            {
+            if (theGrid.ActualWidth <= CalcTimelineWidthFromPct())
                 xPosition = LEFT_PADDING;
-            }
-            else
-            {
-                xPosition = (theGrid.ActualWidth / 2) - (MaxTimelineWidth / 2) + LEFT_PADDING;
-            }
+            else xPosition = (theGrid.ActualWidth / 2) - (CalcTimelineWidthFromPct() / 2) + LEFT_PADDING;
 
             // T at start of timeline line
             theGrid.Children.Add(new Line()
@@ -212,37 +213,29 @@ namespace TimelineCreator
             });
         }
 
+        /// <summary>
+        /// Renders the labelled tick lines onto the timeline.
+        /// </summary>
         private void RenderTickLines()
         {
-            DateTime firstLineTime = RoundUpToHour(viewStartTime);
-
-            if (firstLineTime <= viewEndTime)
+            if (secondsPerPixel > 0)
             {
-                if (secondsPerPixel == 0)
-                {
-                    RenderTickLine(TIME_LINE_THICKNESS + START_END_PADDING, firstLineTime);
-                }
-                else
+                TimeSpan tickSpacing = CalcTickSpacing(viewEndTime - viewStartTime);
+                DateTime firstLineTime = RoundTimeUp(viewStartTime, tickSpacing);
+
+                if (firstLineTime <= viewEndTime)
                 {
                     double yPosition = TIME_LINE_THICKNESS + START_END_PADDING +
                         ((firstLineTime - viewStartTime).TotalSeconds / secondsPerPixel);
 
                     DateTime? previousTime = null;
 
-                    TimeSpan incrvalue = TimeSpan.FromHours(1);
-                    if (viewEndTime - viewStartTime > TimeSpan.FromHours(24))
-                    {
-                        incrvalue = TimeSpan.FromHours(3);
-                    }
-
                     for (DateTime lineTime = firstLineTime;
                          lineTime <= viewEndTime;
-                         lineTime += incrvalue)
+                         lineTime += tickSpacing)
                     {
                         if (lineTime != firstLineTime) // If not first iteration
-                        {
                             yPosition += (lineTime - previousTime!).Value.TotalSeconds / secondsPerPixel;
-                        }
 
                         RenderTickLine(yPosition, lineTime);
                         previousTime = lineTime;
@@ -251,18 +244,12 @@ namespace TimelineCreator
             }
         }
 
-        private static DateTime RoundUpToHour(DateTime dateTime)
-        {
-            DateTime newDateTime = new(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, 0, 0);
-            return (dateTime.Minute != 0) ? newDateTime + TimeSpan.FromHours(1) : newDateTime;
-        }
-
         private void RenderTickLine(double yPosition, DateTime dateTime)
         {
             double xPosition = 0;
-            if (theGrid.ActualWidth > MaxTimelineWidth)
+            if (theGrid.ActualWidth > CalcTimelineWidthFromPct())
             {
-                xPosition = (theGrid.ActualWidth / 2) - (MaxTimelineWidth / 2);
+                xPosition = (theGrid.ActualWidth / 2) - (CalcTimelineWidthFromPct() / 2);
             }
 
             theGrid.Children.Add(new Border()
@@ -287,6 +274,9 @@ namespace TimelineCreator
             tickLabel.Margin = new Thickness(xPosition + 5, yPosition - tickLabel.DesiredSize.Height - 3, 0, 0);
         }
 
+        /// <summary>
+        /// Renders the items onto the timeline.
+        /// </summary>
         private void RenderItems()
         {
             double lastFullItemYPos = 0;
@@ -320,23 +310,16 @@ namespace TimelineCreator
                 TimelineItem item = Items[0];
 
                 if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
-                {
                     RenderItem(item, TIME_LINE_THICKNESS + START_END_PADDING, ref lastFullItemYPos);
-                }
             }
         }
 
         private void RenderItem(TimelineItem item, double yPosition, ref double lastFullItemYPos)
         {
             double xPosition;
-            if (theGrid.ActualWidth <= MaxTimelineWidth)
-            {
+            if (theGrid.ActualWidth <= CalcTimelineWidthFromPct())
                 xPosition = LEFT_PADDING;
-            }
-            else
-            {
-                xPosition = (theGrid.ActualWidth / 2) - (MaxTimelineWidth / 2) + LEFT_PADDING;
-            }
+            else xPosition = (theGrid.ActualWidth / 2) - (CalcTimelineWidthFromPct() / 2) + LEFT_PADDING;
 
             theGrid.Children.Add(item);
             item.Margin = new Thickness(xPosition - item.GetMarkerCenterPos().X, yPosition - item.GetMarkerCenterPos().Y, 0, 0);
@@ -344,6 +327,7 @@ namespace TimelineCreator
 
             lastFullItemYPos = yPosition;
 
+            // TODO: Do these need to be removed at the start of a render?
             item.MouseLeftButtonUp += TimelineItem_MouseLeftButtonUp;
             item.MouseLeftButtonDown += TimelineItem_MouseLeftButtonDown;
         }
@@ -438,14 +422,49 @@ namespace TimelineCreator
                 e.Handled = true;
 
                 if (!hasDragged && e.OriginalSource == theGrid)
-                {
                     SelectedItem = null;
-                }
             }
             else if (e.ChangedButton == MouseButton.Middle)
-            {
                 ResetZoom();
-            }
+        }
+        #endregion
+
+        #region Helpers
+        private double CalcTimelineWidthFromPct()
+        {
+            return (TimelineWidth * ActualWidth) / 100;
+        }
+
+        /// <summary>
+        /// Determines the time between tick lines based on the total time covered by the view.
+        /// </summary>
+        private static TimeSpan CalcTickSpacing(TimeSpan timeSpan)
+        {
+            TimeSpan spacing;
+
+            if (timeSpan <= TimeSpan.FromMinutes(10))
+                spacing = TimeSpan.FromMinutes(1);
+            else if (timeSpan <= TimeSpan.FromMinutes(30))
+                spacing = TimeSpan.FromMinutes(5);
+            else if (timeSpan <= TimeSpan.FromHours(3))
+                spacing = TimeSpan.FromMinutes(15);
+            else if (timeSpan <= TimeSpan.FromHours(6))
+                spacing = TimeSpan.FromMinutes(30);
+            else if (timeSpan <= TimeSpan.FromDays(1))
+                spacing = TimeSpan.FromHours(1);
+            else if (timeSpan <= TimeSpan.FromDays(3))
+                spacing = TimeSpan.FromHours(3);
+            else spacing = TimeSpan.FromHours(6);
+
+            return spacing;
+        }
+
+        /// <summary>
+        /// Rounds a time up to the nearest e.g. 5 minutes, 1 hour, 3 hours, etc.
+        /// </summary>
+        private static DateTime RoundTimeUp(DateTime time, TimeSpan nearest)
+        {
+            return new DateTime((time.Ticks + nearest.Ticks - 1) / nearest.Ticks * nearest.Ticks, time.Kind);
         }
         #endregion
     }
