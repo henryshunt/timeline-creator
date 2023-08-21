@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,7 +17,7 @@ namespace TimelineCreator
             InitializeComponent();
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             timeZoneComboBox.ItemsSource = TimeZoneInfo.GetSystemTimeZones();
             timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
@@ -26,8 +25,6 @@ namespace TimelineCreator
             //TimelineTab tab = TimelineTab.OpenDocument(@"C:\Users\Henry\Starship OFT Timeline 2023-04-20.json");
             //tab.ContextMenu = Resources["tabContextMenu"] as ContextMenu;
             //theTabControl.Items.Add(tab);
-
-            await Task.Delay(0); // Hack, otherwise the new document won't render
 
             theTabControl.Items.Add(TimelineTab.NewDocument());
 
@@ -62,23 +59,35 @@ namespace TimelineCreator
             if (e.IsRepeat == false)
             {
                 if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
+                {
                     NewButton_Click(this, new RoutedEventArgs());
+                }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.O)
+                {
                     OpenButton_Click(this, new RoutedEventArgs());
+                }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+                {
                     SaveButton_Click(this, new RoutedEventArgs());
+                }
                 else if (e.Key == Key.Escape)
                 {
                     if (selectedTab?.Timeline.SelectedItem != null)
+                    {
                         selectedTab.Timeline.SelectedItem = null;
+                    }
                 }
                 else if (e.Key == Key.Delete)
                 {
                     if (selectedTab?.Timeline.SelectedItem != null)
+                    {
                         selectedTab.Timeline.Items.Remove(selectedTab.Timeline.SelectedItem);
+                    }
                 }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0)
+                {
                     selectedTab?.Timeline.ResetZoom();
+                }
             }
         }
 
@@ -197,11 +206,17 @@ namespace TimelineCreator
                 theTabControl.Items.Remove(selectedTab);
 
                 if (theTabControl.Items.Count == 0)
+                {
                     theTabControl.SelectedItem = null;
+                }
                 else if (theTabControl.Items.Count >= tabIndex)
+                {
                     theTabControl.SelectedIndex = tabIndex;
+                }
                 else if (theTabControl.Items.Count - 1 == tabIndex)
+                {
                     theTabControl.SelectedIndex = tabIndex - 1;
+                }
             }
         }
         #endregion
@@ -283,19 +298,25 @@ namespace TimelineCreator
         private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (selectedTab != null)
+            {
                 selectedTab.Title = ((TextBox)sender).Text;
+            }
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (selectedTab != null)
+            {
                 selectedTab.Description = ((TextBox)sender).Text;
+            }
         }
 
         private void TimeZoneComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (selectedTab != null)
+            {
                 selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
+            }
         }
 
         private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

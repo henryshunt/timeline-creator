@@ -148,6 +148,7 @@ namespace TimelineCreator
             }
 
             tab.AddCollectionChangedHandler();
+            tab.Timeline.ResetZoom();
 
             tab.FilePath = filePath;
             tab.Header = tab.Title;
