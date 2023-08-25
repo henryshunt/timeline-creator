@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace TimelineCreator
 {
@@ -16,6 +14,7 @@ namespace TimelineCreator
         public ItemDialog(TimeZoneInfo timeZone)
         {
             this.timeZone = timeZone;
+
             Item = new TimelineItem()
             {
                 DateTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timeZone.Id)
@@ -39,69 +38,33 @@ namespace TimelineCreator
             {
                 Title = "Edit Timeline Item";
                 submitButton.Content = "Save Item";
+                theTextBox.Text = Item.Text;
             }
 
-            timeTextBox.Text = Item.DateTime.ToString("dd/MM/yyyy HH:mm:ss");
-
-            itemTextField.Text = Item.Text;
-            itemTextField.Focus();
+            theTimeField.Value = Item.DateTime;
+            theTextBox.Focus();
         }
 
-        private void TimeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void TheTimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)
         {
-            try
-            {
-                DateTime.ParseExact(timeTextBox.Text, "dd/MM/yyyy HH:mm:ss", null);
-                submitButton.IsEnabled = true;
-            }
-            catch (FormatException)
-            {
-                submitButton.IsEnabled = false;
-            }
+            submitButton.IsEnabled = e.Value != null;
         }
 
-        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void TheTimeField_ValidationError(object sender, EventArgs e)
         {
-            if (e.Key == Key.Enter && submitButton.IsEnabled)
-            {
-                SubmitButton_Click(this, new RoutedEventArgs());
-                e.Handled = true;
-            }
+            submitButton.IsEnabled = false;
         }
 
         private void NowButton_Click(object sender, RoutedEventArgs e)
         {
-            timeTextBox.Text = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timeZone.Id)
-                .ToString("dd/MM/yyyy HH:mm:ss");
+            theTimeField.Value = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timeZone.Id);
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            Item.DateTime = DateTime.ParseExact(timeTextBox.Text, "dd/MM/yyyy HH:mm:ss", null);
-            Item.Text = itemTextField.Text;
-
+            Item.DateTime = (DateTime)theTimeField.Value!;
+            Item.Text = theTextBox.Text;
             DialogResult = true;
-        }
-
-        private void tZeroButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TimeSpan span = TimeSpan.Parse(addTimeTextBox.Text);
-            //DateTime t0 = new(2023, 4, 20, 8, 28, 0);
-
-            //DateTime time = t0 - span;
-
-            //// Add item in correct place by DateTime
-            //int i = 0;
-            //for (; i < selectedTab.Timeline.Items.Count; i++)
-            //{
-            //    if (selectedTab.Timeline.Items[i].DateTime > time)
-            //        break;
-            //}
-
-            //selectedTab.Timeline.Items.Insert(i, new TimelineItem() { DateTime = time, Text = addTextTextBox.Text });
-
-            //addTimeTextBox.Clear();
-            //addTextTextBox.Clear();
         }
     }
 }

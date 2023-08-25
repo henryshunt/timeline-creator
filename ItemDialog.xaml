@@ -12,12 +12,24 @@
         </Grid.RowDefinitions>
 
         <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
             <Grid VerticalAlignment="Top">
-                <TextBox x:Name="timeTextBox" TextAlignment="Center" TextChanged="TimeTextBox_TextChanged" Margin="0,0,48,0" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-                <Button Content="Now" HorizontalAlignment="Right" Click="NowButton_Click"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <local:DateTimeField x:Name="theTimeField" ValueChanged="TheTimeField_ValueChanged" ValidationError="TheTimeField_ValidationError"/>
+                <Button Content="Now" HorizontalAlignment="Right" Click="NowButton_Click" Grid.Column="2"/>
             </Grid>
 
-            <TextBox x:Name="itemTextField" Margin="0,31,0,0" PreviewKeyDown="TextBox_PreviewKeyDown" TextWrapping="Wrap" Height="Auto"/>
+            <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="Auto" Grid.Row="2" MaxLines="1"/>
 
             <!--<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                 <RadioButton Style="{DynamicResource ColouredRadioButtonStyle}" Margin="0,0,5,0" Background="SlateGray" IsChecked="True"/>

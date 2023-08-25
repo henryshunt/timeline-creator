@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="TimelineCreator.DateTimeField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TimelineCreator"
+             
+             Loaded="UserControl_Loaded">
+
+    <Grid>
+        <TextBox x:Name="theTextBox" TextAlignment="Center" MaxLength="19" MaxLines="1" LostFocus="TheTextBox_LostFocus" Validation.Error="TheTextBox_Error" Validation.ErrorTemplate="{x:Null}" TextChanged="TheTextBox_TextChanged" Padding="4,-1,4,0">
+            <TextBox.Text>
+                <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
+                    <Binding.Converter>
+                        <local:DateTimeValueConverter/>
+                    </Binding.Converter>
+                    <Binding.ValidationRules>
+                        <local:DateTimeValidationRule x:Name="theValidationRule" ValidationStep="RawProposedValue"/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+
+        <TextBlock x:Name="placeholderText" Text="YYYY/MM/DD HH:MM:SS" Foreground="LightGray" VerticalAlignment="Center" Margin="5,-1,5,0" HorizontalAlignment="Center" IsHitTestVisible="False"/>
+    </Grid>
+</UserControl>
