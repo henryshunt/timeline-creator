@@ -103,7 +103,9 @@ namespace TimelineCreator
             };
 
             if (!isFromFile)
+            {
                 Timeline.Items.CollectionChanged += Items_CollectionChanged;
+            }
 
             Content = Timeline;
             Header = Title;
@@ -200,12 +202,16 @@ namespace TimelineCreator
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 foreach (TimelineItem item in e.NewItems!)
+                {
                     item.PropertyChanged += Item_PropertyChanged;
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 foreach (TimelineItem item in e.OldItems!)
+                {
                     item.PropertyChanged -= Item_PropertyChanged;
+                }
             }
 
             HasUnsavedChanges = true;

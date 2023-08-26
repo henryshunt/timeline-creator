@@ -27,13 +27,6 @@ namespace TimelineCreator
             //theTabControl.Items.Add(tab);
 
             theTabControl.Items.Add(TimelineTab.NewDocument());
-
-            //TimelineTab document = TimelineTab.NewDocument();
-            //document.Timeline.Items.Add(new TimelineItem() { DateTime = new DateTime(2023, 7, 13, 0, 0, 0) });
-            //document.Timeline.Items.Add(new TimelineItem() { DateTime = new DateTime(2023, 7, 13, 12, 0, 0) });
-            //document.Timeline.Items.Add(new TimelineItem() { DateTime = new DateTime(2023, 7, 14, 0, 0, 0) });
-            //theTabControl.Items.Add(document);
-
             theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
         }
 
@@ -184,7 +177,9 @@ namespace TimelineCreator
                 for (; i < selectedTab!.Timeline.Items.Count; i++)
                 {
                     if (selectedTab.Timeline.Items[i].DateTime > itemDialog.Item.DateTime)
+                    {
                         break;
+                    }
                 }
 
                 selectedTab.Timeline.Items.Insert(i, itemDialog.Item);
@@ -257,6 +252,30 @@ namespace TimelineCreator
             if (t0ModeCheckBox.IsChecked == true && selectedTab != null)
             {
                 selectedTab.Timeline.TZeroTime = t0TimeField.Value;
+            }
+        }
+
+        private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (selectedTab != null)
+            {
+                selectedTab.Title = ((TextBox)sender).Text;
+            }
+        }
+
+        private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (selectedTab != null)
+            {
+                selectedTab.Description = ((TextBox)sender).Text;
+            }
+        }
+
+        private void TimeZoneComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (selectedTab != null)
+            {
+                selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
             }
         }
         #endregion
@@ -334,29 +353,5 @@ namespace TimelineCreator
                 theTabControl.SelectedIndex = tabIndex - 1;
         }
         #endregion
-
-        private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (selectedTab != null)
-            {
-                selectedTab.Title = ((TextBox)sender).Text;
-            }
-        }
-
-        private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (selectedTab != null)
-            {
-                selectedTab.Description = ((TextBox)sender).Text;
-            }
-        }
-
-        private void TimeZoneComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (selectedTab != null)
-            {
-                selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
-            }
-        }
     }
 }
