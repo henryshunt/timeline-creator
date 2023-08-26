@@ -42,7 +42,7 @@ namespace TimelineCreator
             }
 
             theTimeField.Value = Item.DateTime;
-            theTextBox.Focus();
+            theTimeField.Focus();
         }
 
         private void TheTimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)

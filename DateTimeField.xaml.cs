@@ -41,6 +41,12 @@ namespace TimelineCreator
             SetPlaceholderVisibility();
         }
 
+        public new void Focus()
+        {
+            theTextBox.Focus();
+            theTextBox.CaretIndex = theTextBox.Text.Length;
+        }
+
         private void TheTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (IsLoaded)
