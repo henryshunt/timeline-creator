@@ -11,8 +11,6 @@ namespace TimelineCreator
 {
     public partial class MainWindow : Window
     {
-        private TimelineTab? selectedTab => (TimelineTab)theTabControl.SelectedItem;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -66,43 +64,40 @@ namespace TimelineCreator
                 }
                 else if (e.Key == Key.Escape)
                 {
-                    if (selectedTab?.Timeline.SelectedItem != null)
-                    {
-                        selectedTab.Timeline.SelectedItem = null;
-                    }
+                    GetSelectedTab().Timeline.SelectedItem = null;
                 }
                 else if (e.Key == Key.Delete)
                 {
-                    if (selectedTab?.Timeline.SelectedItem != null)
+                    if (GetSelectedTab().Timeline.SelectedItem != null)
                     {
-                        selectedTab.Timeline.Items.Remove(selectedTab.Timeline.SelectedItem);
+                        GetSelectedTab().Timeline.Items.Remove(GetSelectedTab().Timeline.SelectedItem!);
                     }
                 }
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0)
                 {
-                    selectedTab?.Timeline.ResetZoom();
+                    GetSelectedTab().Timeline.ResetZoom();
                 }
                 else if (e.Key == Key.Home) // Move view range to start at first item
                 {
-                    if (selectedTab != null && selectedTab.Timeline.Items.Count > 0)
+                    if (GetSelectedTab().Timeline.Items.Count > 0)
                     {
-                        TimeSpan viewRange = selectedTab.Timeline.GetViewRange().Item2 -
-                            selectedTab.Timeline.GetViewRange().Item1;
+                        (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
+                        TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
 
-                        selectedTab.Timeline.GoToViewRange(selectedTab.Timeline.Items[0].DateTime,
-                            selectedTab.Timeline.Items[0].DateTime + viewRange);
+                        GetSelectedTab().Timeline.GoToViewRange(GetSelectedTab().Timeline.Items[0].DateTime,
+                            GetSelectedTab().Timeline.Items[0].DateTime + viewRange);
                     }
                 }
                 else if (e.Key == Key.End) // Move view range to end at last item
                 {
-                    if (selectedTab != null && selectedTab.Timeline.Items.Count > 0)
+                    if (GetSelectedTab().Timeline.Items.Count > 0)
                     {
-                        TimeSpan viewRange = selectedTab.Timeline.GetViewRange().Item2 -
-                            selectedTab.Timeline.GetViewRange().Item1;
+                        (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
+                        TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
 
-                        selectedTab.Timeline.GoToViewRange(
-                            selectedTab.Timeline.Items.Last().DateTime - viewRange,
-                            selectedTab.Timeline.Items.Last().DateTime);
+                        GetSelectedTab().Timeline.GoToViewRange(
+                            GetSelectedTab().Timeline.Items.Last().DateTime - viewRange,
+                            GetSelectedTab().Timeline.Items.Last().DateTime);
                     }
                 }
             }
@@ -158,7 +153,7 @@ namespace TimelineCreator
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedTab?.FilePath == null)
+            if (GetSelectedTab().FilePath == null)
             {
                 string fileName = docTitleTextBox.Text;
                 foreach (char c in Path.GetInvalidFileNameChars())
@@ -176,7 +171,7 @@ namespace TimelineCreator
                 {
                     try
                     {
-                        selectedTab?.SaveDocumentAs(saveDialog.FileName);
+                        GetSelectedTab().SaveDocumentAs(saveDialog.FileName);
                     }
                     catch (IOException)
                     {
@@ -186,7 +181,7 @@ namespace TimelineCreator
             }
             else
             {
-                selectedTab.SaveDocument();
+                GetSelectedTab().SaveDocument();
             }
         }
 
@@ -198,126 +193,111 @@ namespace TimelineCreator
             {
                 // Add item at correct position in time-based ordering
                 int i = 0;
-                for (; i < selectedTab!.Timeline.Items.Count; i++)
+                for (; i < GetSelectedTab().Timeline.Items.Count; i++)
                 {
-                    if (selectedTab.Timeline.Items[i].DateTime > itemDialog.Item.DateTime)
+                    if (GetSelectedTab().Timeline.Items[i].DateTime > itemDialog.Item.DateTime)
                     {
                         break;
                     }
                 }
 
-                selectedTab.Timeline.Items.Insert(i, itemDialog.Item);
+                GetSelectedTab().Timeline.Items.Insert(i, itemDialog.Item);
 
                 // Centre view range on the new item if it's outside the current view
-                if (itemDialog.Item.DateTime < selectedTab.Timeline.GetViewRange().Item1 ||
-                    itemDialog.Item.DateTime > selectedTab.Timeline.GetViewRange().Item2)
+                if (itemDialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
+                    itemDialog.Item.DateTime > GetSelectedTab().Timeline.GetViewRange().Item2)
                 {
-                    TimeSpan viewRangeHalf = (selectedTab.Timeline.GetViewRange().Item2 -
-                        selectedTab.Timeline.GetViewRange().Item1) / 2;
+                    TimeSpan viewRangeHalf = (GetSelectedTab().Timeline.GetViewRange().Item2 -
+                        GetSelectedTab().Timeline.GetViewRange().Item1) / 2;
 
-                    selectedTab.Timeline.GoToViewRange(itemDialog.Item.DateTime - viewRangeHalf,
+                    GetSelectedTab().Timeline.GoToViewRange(itemDialog.Item.DateTime - viewRangeHalf,
                         itemDialog.Item.DateTime + viewRangeHalf);
                 }
 
-                selectedTab.Timeline.SelectedItem = itemDialog.Item;
+                GetSelectedTab().Timeline.SelectedItem = itemDialog.Item;
             }
         }
 
         private void ResetZoomButton_Click(object sender, RoutedEventArgs e)
         {
-            selectedTab?.Timeline.ResetZoom();
+            GetSelectedTab().Timeline.ResetZoom();
         }
 
         private void CloseTabButton_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedTab != null)
+            if (GetSelectedTab().HasUnsavedChanges)
             {
-                if (selectedTab.HasUnsavedChanges)
+                if (MessageBox.Show("You have unsaved changes. Continue?", "",
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                 {
-                    if (MessageBox.Show("You have unsaved changes. Continue?", "",
-                        MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-                    {
-                        return;
-                    }
+                    return;
                 }
+            }
 
-                int tabIndex = theTabControl.Items.IndexOf(selectedTab);
-                theTabControl.Items.Remove(selectedTab);
+            int tabIndex = theTabControl.Items.IndexOf(GetSelectedTab());
+            theTabControl.Items.Remove(GetSelectedTab());
 
-                if (theTabControl.Items.Count == 0)
-                {
-                    NewButton_Click(this, new RoutedEventArgs());
-                }
-                else if (theTabControl.Items.Count >= tabIndex)
-                {
-                    theTabControl.SelectedIndex = tabIndex;
-                }
-                else if (theTabControl.Items.Count - 1 == tabIndex)
-                {
-                    theTabControl.SelectedIndex = tabIndex - 1;
-                }
+            if (theTabControl.Items.Count == 0)
+            {
+                NewButton_Click(this, new RoutedEventArgs());
+            }
+            else if (theTabControl.Items.Count >= tabIndex)
+            {
+                theTabControl.SelectedIndex = tabIndex;
+            }
+            else if (theTabControl.Items.Count - 1 == tabIndex)
+            {
+                theTabControl.SelectedIndex = tabIndex - 1;
             }
         }
 
         private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (selectedTab != null)
+            if (IsLoaded)
             {
-                int percentage = (int)Math.Round(((Slider)sender).Value);
-                widthLabel.Text = percentage + "%";
-                selectedTab.Timeline.TimelineWidth = percentage;
+                GetSelectedTab().Timeline.TimelineWidth = (int)Math.Round(((Slider)sender).Value);
             }
         }
 
         private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            if (selectedTab != null)
+            if (((CheckBox)sender).IsChecked == true)
             {
-                if (((CheckBox)sender).IsChecked == true)
-                {
-                    selectedTab.Timeline.TZeroTime = t0TimeField.Value;
-                }
-                else
-                {
-                    selectedTab.Timeline.TZeroTime = null;
-                }
+                GetSelectedTab().Timeline.TZeroTime = t0TimeField.Value;
+            }
+            else
+            {
+                GetSelectedTab().Timeline.TZeroTime = null;
             }
         }
 
         private void T0TimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)
         {
-            if (t0ModeCheckBox.IsChecked == true && selectedTab != null)
+            if (t0ModeCheckBox.IsChecked == true)
             {
-                selectedTab.Timeline.TZeroTime = t0TimeField.Value;
+                GetSelectedTab().Timeline.TZeroTime = t0TimeField.Value;
             }
         }
 
         private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (selectedTab != null)
-            {
-                selectedTab.Title = ((TextBox)sender).Text;
-            }
+            GetSelectedTab().Title = ((TextBox)sender).Text;
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (selectedTab != null)
-            {
-                selectedTab.Description = ((TextBox)sender).Text;
-            }
+            GetSelectedTab().Description = ((TextBox)sender).Text;
         }
 
         private void TimeZoneComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (selectedTab != null)
-            {
-                selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
-            }
+            GetSelectedTab().TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
         }
         #endregion
 
         #region Tabs
+        private TimelineTab GetSelectedTab() => (TimelineTab)theTabControl.SelectedItem;
+
         private void TheTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.RemovedItems.Count > 0)
