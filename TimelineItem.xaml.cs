@@ -8,6 +8,9 @@ namespace TimelineCreator
 {
     public partial class TimelineItem : INotifyPropertyChanged
     {
+        private static readonly SolidColorBrush ELLIPSE_COLOUR = new(Colors.SlateGray);
+        private static readonly SolidColorBrush HOVER_COLOUR = new(Colors.MidnightBlue);
+
         private DateTime dateTime = DateTime.Now;
         public DateTime DateTime
         {
@@ -15,7 +18,7 @@ namespace TimelineCreator
             set
             {
                 dateTime = value;
-                timeTextBlock.Text = value.ToString("HH:mm:ss");
+                DisplayTimeValue();
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateTime)));
             }
@@ -34,9 +37,6 @@ namespace TimelineCreator
             }
         }
 
-        private static readonly SolidColorBrush ELLIPSE_COLOUR = new(Colors.SlateGray);
-        private static readonly SolidColorBrush HOVER_COLOUR = new(Colors.MidnightBlue);
-
         private bool isSelected = false;
         public bool IsSelected
         {
@@ -45,6 +45,22 @@ namespace TimelineCreator
             {
                 isSelected = value;
                 markerEllipse.Fill = value ? HOVER_COLOUR : ELLIPSE_COLOUR;
+            }
+        }
+
+        private DateTime? tZeroTime = null;
+
+        /// <summary>
+        /// Time to display item time as a countdown/up relative to. <see cref="null"/> to display the item time.
+        /// </summary>
+        internal DateTime? TZeroTime
+        {
+            get { return tZeroTime; }
+
+            set
+            {
+                tZeroTime = value;
+                DisplayTimeValue();
             }
         }
 
@@ -69,10 +85,41 @@ namespace TimelineCreator
             }
         }
 
+        /// <summary>
+        /// Gets the position of the centre of the item's marker relative to the item's bounds.
+        /// </summary>
         internal Point GetMarkerCenterPos()
         {
             return new Point(timeTextBlock.DesiredSize.Width + 10 + (markerEllipse.Width / 2),
                 timeTextBlock.DesiredSize.Height / 2);
+        }
+
+        /// <summary>
+        /// Displays the item time based on the value of <see cref="TZeroTime"/>.
+        /// </summary>
+        private void DisplayTimeValue()
+        {
+            if (TZeroTime == null)
+            {
+                timeTextBlock.Text = DateTime.ToString("HH:mm:ss");
+            }
+            else
+            {
+                TimeSpan relToTZero = DateTime - (DateTime)TZeroTime;
+
+                if (relToTZero == TimeSpan.Zero)
+                {
+                    timeTextBlock.Text = relToTZero.ToString("hh\\:mm\\:ss");
+                }
+                else if (relToTZero > TimeSpan.Zero)
+                {
+                    timeTextBlock.Text = "+" + relToTZero.ToString("hh\\:mm\\:ss");
+                }
+                else if (relToTZero < TimeSpan.Zero)
+                {
+                    timeTextBlock.Text = "-" + relToTZero.ToString("hh\\:mm\\:ss");
+                }
+            }
         }
     }
 }

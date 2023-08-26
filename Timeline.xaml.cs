@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +18,7 @@ namespace TimelineCreator
         private const double TIME_LINE_THICKNESS = 2;
         private readonly SolidColorBrush TIME_LINE_COLOUR = new(Colors.Black);
         private readonly SolidColorBrush TICK_LINE_COLOUR = new(Colors.LightGray);
-        private const double LEFT_PADDING = 130;
+        private const double LEFT_PADDING = 150;
         private const double START_END_PADDING = 15;
 
 
@@ -38,7 +37,6 @@ namespace TimelineCreator
                     throw new ArgumentOutOfRangeException();
 
                 timelineWidth = value;
-                Debug.WriteLine("set");
 
                 if (IsLoaded)
                 {
@@ -80,6 +78,28 @@ namespace TimelineCreator
                         selectedItem.IsSelected = true;
                     }
                 }
+            }
+        }
+
+        private DateTime? tZeroTime = null;
+
+        /// <summary>
+        /// Time to display items as a countdown/up relative to. <see cref="null"/> to display the item time.
+        /// </summary>
+        public DateTime? TZeroTime
+        {
+            get { return tZeroTime; }
+
+            set
+            {
+                tZeroTime = value;
+
+                foreach (TimelineItem item in Items)
+                {
+                    item.TZeroTime = tZeroTime;
+                }
+
+                Render();
             }
         }
 
@@ -135,6 +155,7 @@ namespace TimelineCreator
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 TimelineItem item = (TimelineItem)e.NewItems![0]!;
+                item.TZeroTime = TZeroTime;
 
                 if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
                 {
@@ -165,7 +186,6 @@ namespace TimelineCreator
         {
             if (IsLoaded)
             {
-                Debug.WriteLine("render");
                 theGrid.Children.Clear();
 
                 RenderTimelineLine();

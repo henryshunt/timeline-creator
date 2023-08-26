@@ -218,6 +218,7 @@ namespace TimelineCreator
 
         private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            // Invoked whenever item time or text changes
             HasUnsavedChanges = true;
         }
     }

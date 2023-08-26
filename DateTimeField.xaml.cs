@@ -65,6 +65,8 @@ namespace TimelineCreator
         {
             // Load the currently committed (valid) value back into textbox on focus loss
             ((TextBox)sender).GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+
+            theTextBox.Background = null;
         }
 
         private void SetPlaceholderVisibility()
@@ -87,7 +89,7 @@ namespace TimelineCreator
         {
             if (value != null)
             {
-                return ((DateTime)value).ToString("yyyy/MM/dd HH:mm:ss");
+                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
             }
             else
             {
@@ -101,7 +103,7 @@ namespace TimelineCreator
             {
                 try
                 {
-                    return DateTime.ParseExact((string)value, "yyyy/MM/dd HH:mm:ss", null);
+                    return DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
                 }
                 catch (FormatException)
                 {
@@ -125,7 +127,7 @@ namespace TimelineCreator
                 try
                 {
                     // TODO: Add time zone property and check if value is valid in that zone
-                    DateTime _ = DateTime.ParseExact((string)value, "yyyy/MM/dd HH:mm:ss", null);
+                    DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
                     return new ValidationResult(true, null);
                 }
                 catch (FormatException)

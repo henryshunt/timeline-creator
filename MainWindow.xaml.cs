@@ -143,9 +143,16 @@ namespace TimelineCreator
         {
             if (selectedTab?.FilePath == null)
             {
+                string fileName = docTitleTextBox.Text;
+                foreach (char c in Path.GetInvalidFileNameChars())
+                {
+                    fileName = fileName.Replace(c, '-');
+                }
+
                 SaveFileDialog saveDialog = new()
                 {
-                    Filter = "JSON Files (*.json) | *.json"
+                    Filter = "JSON Files (*.json) | *.json",
+                    FileName = fileName,
                 };
 
                 if (saveDialog.ShowDialog() == true)
@@ -207,7 +214,7 @@ namespace TimelineCreator
 
                 if (theTabControl.Items.Count == 0)
                 {
-                    theTabControl.SelectedItem = null;
+                    NewButton_Click(this, new RoutedEventArgs());
                 }
                 else if (theTabControl.Items.Count >= tabIndex)
                 {
@@ -217,6 +224,39 @@ namespace TimelineCreator
                 {
                     theTabControl.SelectedIndex = tabIndex - 1;
                 }
+            }
+        }
+
+        private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (selectedTab != null)
+            {
+                int percentage = (int)Math.Round(((Slider)sender).Value);
+                widthLabel.Text = percentage + "%";
+                selectedTab.Timeline.TimelineWidth = percentage;
+            }
+        }
+
+        private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (selectedTab != null)
+            {
+                if (((CheckBox)sender).IsChecked == true)
+                {
+                    selectedTab.Timeline.TZeroTime = t0TimeField.Value;
+                }
+                else
+                {
+                    selectedTab.Timeline.TZeroTime = null;
+                }
+            }
+        }
+
+        private void T0TimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)
+        {
+            if (t0ModeCheckBox.IsChecked == true && selectedTab != null)
+            {
+                selectedTab.Timeline.TZeroTime = t0TimeField.Value;
             }
         }
         #endregion
@@ -316,16 +356,6 @@ namespace TimelineCreator
             if (selectedTab != null)
             {
                 selectedTab.TimeZone = (TimeZoneInfo)((ComboBox)sender).SelectedItem;
-            }
-        }
-
-        private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (selectedTab != null)
-            {
-                int percentage = (int)Math.Round(((Slider)sender).Value);
-                widthLabel.Text = percentage + "%";
-                selectedTab.Timeline.TimelineWidth = percentage;
             }
         }
     }

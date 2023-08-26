@@ -6,13 +6,18 @@
 
     <Application.Resources>
         <Style TargetType="{x:Type Button}">
-            <Setter Property="Padding" Value="8,0,8,2"/>
             <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="8,0,8,2"/>
         </Style>
 
         <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Padding" Value="4,3,4,0"/>
             <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="4,3,4,0"/>
+        </Style>
+
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="7,5,7,0"/>
         </Style>
 
 

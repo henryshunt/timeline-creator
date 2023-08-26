@@ -4,5 +4,5 @@
              
              Background="White" Loaded="UserControl_Loaded" SizeChanged="UserControl_SizeChanged" MouseWheel="UserControl_MouseWheel" MouseDown="UserControl_MouseDown" MouseUp="UserControl_MouseUp" MouseMove="UserControl_MouseMove" SnapsToDevicePixels="True">
 
-    <Grid x:Name="theGrid" MaxWidth="0"/>
+    <Grid x:Name="theGrid" MaxWidth="0" Background="White"/>
 </UserControl>
