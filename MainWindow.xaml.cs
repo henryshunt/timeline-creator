@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Linq;
 
 namespace TimelineCreator
 {
@@ -80,6 +81,29 @@ namespace TimelineCreator
                 else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0)
                 {
                     selectedTab?.Timeline.ResetZoom();
+                }
+                else if (e.Key == Key.Home) // Move view range to start at first item
+                {
+                    if (selectedTab != null && selectedTab.Timeline.Items.Count > 0)
+                    {
+                        TimeSpan viewRange = selectedTab.Timeline.GetViewRange().Item2 -
+                            selectedTab.Timeline.GetViewRange().Item1;
+
+                        selectedTab.Timeline.GoToViewRange(selectedTab.Timeline.Items[0].DateTime,
+                            selectedTab.Timeline.Items[0].DateTime + viewRange);
+                    }
+                }
+                else if (e.Key == Key.End) // Move view range to end at last item
+                {
+                    if (selectedTab != null && selectedTab.Timeline.Items.Count > 0)
+                    {
+                        TimeSpan viewRange = selectedTab.Timeline.GetViewRange().Item2 -
+                            selectedTab.Timeline.GetViewRange().Item1;
+
+                        selectedTab.Timeline.GoToViewRange(
+                            selectedTab.Timeline.Items.Last().DateTime - viewRange,
+                            selectedTab.Timeline.Items.Last().DateTime);
+                    }
                 }
             }
         }
@@ -172,7 +196,7 @@ namespace TimelineCreator
 
             if (itemDialog.ShowDialog() == true)
             {
-                // Add item at correct position in time order
+                // Add item at correct position in time-based ordering
                 int i = 0;
                 for (; i < selectedTab!.Timeline.Items.Count; i++)
                 {
@@ -183,6 +207,19 @@ namespace TimelineCreator
                 }
 
                 selectedTab.Timeline.Items.Insert(i, itemDialog.Item);
+
+                // Centre view range on the new item if it's outside the current view
+                if (itemDialog.Item.DateTime < selectedTab.Timeline.GetViewRange().Item1 ||
+                    itemDialog.Item.DateTime > selectedTab.Timeline.GetViewRange().Item2)
+                {
+                    TimeSpan viewRangeHalf = (selectedTab.Timeline.GetViewRange().Item2 -
+                        selectedTab.Timeline.GetViewRange().Item1) / 2;
+
+                    selectedTab.Timeline.GoToViewRange(itemDialog.Item.DateTime - viewRangeHalf,
+                        itemDialog.Item.DateTime + viewRangeHalf);
+                }
+
+                selectedTab.Timeline.SelectedItem = itemDialog.Item;
             }
         }
 

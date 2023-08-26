@@ -124,7 +124,7 @@ namespace TimelineCreator
         {
             InitializeComponent();
 
-            // Default view window is start of current day to start of next day
+            // Default view range is start of current day to start of next day
             DateTime now = DateTime.Now;
             viewStartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
             viewEndTime = viewStartTime + TimeSpan.FromDays(1);
@@ -337,13 +337,13 @@ namespace TimelineCreator
 
         #region Pan & Zoom
         /// <summary>
-        /// Resets the view window to show all items on the timeline.
+        /// Resets the view range to show all items on the timeline.
         /// </summary>
         public void ResetZoom()
         {
             if (Items.Count == 0)
             {
-                // Default view window is start of current day to start of next day
+                // Default view range is start of current day to start of next day
                 DateTime now = DateTime.Now;
                 viewStartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
                 viewEndTime = viewStartTime + TimeSpan.FromDays(1);
@@ -360,6 +360,24 @@ namespace TimelineCreator
             }
 
             Render();
+        }
+
+        /// <summary>
+        /// Sets the view range to a specific start and end time.
+        /// </summary>
+        public void GoToViewRange(DateTime viewStart, DateTime viewEnd)
+        {
+            viewStartTime = viewStart;
+            viewEndTime = viewEnd;
+            Render();
+        }
+
+        /// <summary>
+        /// Gets the start and end times that define the current view range.
+        /// </summary>
+        public (DateTime, DateTime) GetViewRange()
+        {
+            return (viewStartTime, viewEndTime);
         }
 
         private void Zoom(int percent, double centerYPos)

@@ -38,7 +38,7 @@ namespace TimelineCreator
         }
 
         private bool isSelected = false;
-        public bool IsSelected
+        internal bool IsSelected
         {
             get { return isSelected; }
             set

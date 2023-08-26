@@ -15,6 +15,8 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Ctrl-O -- Open a document
 - Ctrl-S -- Save the open document
 - Click & Drag -- Move up or down the timeline
+- Home -- Move timeline view to start at first item
+- End -- Move timeline view to end at last item
 - Mouse Wheel Scroll -- Zoom in/out
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
 - Delete -- Delete selected item
