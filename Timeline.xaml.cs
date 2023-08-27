@@ -141,6 +141,7 @@ namespace TimelineCreator
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             theGrid.MaxWidth = CalcTimelineWidthFromPct();
+            Render();
         }
 
         private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
