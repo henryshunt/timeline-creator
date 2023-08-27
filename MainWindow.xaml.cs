@@ -21,7 +21,8 @@ namespace TimelineCreator
             timeZoneComboBox.ItemsSource = TimeZoneInfo.GetSystemTimeZones();
             timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
 
-            //TimelineTab tab = TimelineTab.OpenDocument(@"C:\Users\Henry\Starship OFT Timeline 2023-04-20.json");
+            //TimelineTab tab = TimelineTab.OpenDocument(
+            //    "C:/Users/Henry/Documents/Timelines/B9 Static Fire 2023-08-25.json");
             //tab.ContextMenu = Resources["tabContextMenu"] as ContextMenu;
             //theTabControl.Items.Add(tab);
 
@@ -253,30 +254,17 @@ namespace TimelineCreator
 
         private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (IsLoaded)
-            {
-                GetSelectedTab().Timeline.TimelineWidth = (int)Math.Round(((Slider)sender).Value);
-            }
+            GetSelectedTab().TimelineWidth = (int)Math.Round(((Slider)sender).Value);
+        }
+
+        private void T0TimeField_ValueChanged(object? sender, DateTimeValueChangedEventArgs e)
+        {
+            GetSelectedTab().TZeroTime = t0TimeField.Value;
         }
 
         private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            if (((CheckBox)sender).IsChecked == true)
-            {
-                GetSelectedTab().Timeline.TZeroTime = t0TimeField.Value;
-            }
-            else
-            {
-                GetSelectedTab().Timeline.TZeroTime = null;
-            }
-        }
-
-        private void T0TimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)
-        {
-            if (t0ModeCheckBox.IsChecked == true)
-            {
-                GetSelectedTab().Timeline.TZeroTime = t0TimeField.Value;
-            }
+            GetSelectedTab().TZeroMode = ((CheckBox)sender).IsChecked == true;
         }
 
         private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -309,6 +297,13 @@ namespace TimelineCreator
                 removedTab.Timeline.SelectionChanged -= Timeline_SelectionChanged;
                 removedTab.Timeline.MouseDoubleClick -= Timeline_MouseDoubleClick;
 
+                widthSlider.ValueChanged -= WidthSlider_ValueChanged;
+                widthSlider.Value = 0;
+                t0TimeField.ValueChanged -= T0TimeField_ValueChanged;
+                t0TimeField.Value = null;
+                t0ModeCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
+                t0ModeCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
+                t0ModeCheckBox.IsChecked = false;
                 docTitleTextBox.TextChanged -= DocTitleTextBox_TextChanged;
                 docTitleTextBox.Text = null;
                 docDescripTextBox.TextChanged -= DocDescripTextBox_TextChanged;
@@ -325,6 +320,13 @@ namespace TimelineCreator
                 addedTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
                 addedTab.Timeline.MouseDoubleClick += Timeline_MouseDoubleClick;
 
+                widthSlider.Value = addedTab.TimelineWidth;
+                widthSlider.ValueChanged += WidthSlider_ValueChanged;
+                t0TimeField.Value = addedTab.TZeroTime;
+                t0TimeField.ValueChanged += T0TimeField_ValueChanged;
+                t0ModeCheckBox.IsChecked = addedTab.TZeroMode;
+                t0ModeCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
+                t0ModeCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
                 docTitleTextBox.Text = addedTab.Title;
                 docTitleTextBox.TextChanged += DocTitleTextBox_TextChanged;
                 docDescripTextBox.Text = addedTab.Description;

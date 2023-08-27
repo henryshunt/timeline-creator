@@ -13,7 +13,7 @@ namespace TimelineCreator
         private DateTime? value = null;
         public DateTime? Value
         {
-            get { return value; }
+            get => value;
 
             set
             {

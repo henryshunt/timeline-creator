@@ -22,7 +22,7 @@ namespace TimelineCreator
         /// </summary>
         public bool HasUnsavedChanges
         {
-            get { return hasUnsavedChanges; }
+            get => hasUnsavedChanges;
 
             private set
             {
@@ -46,7 +46,7 @@ namespace TimelineCreator
         /// </summary>
         public string Title
         {
-            get { return title; }
+            get => title;
 
             set
             {
@@ -62,7 +62,7 @@ namespace TimelineCreator
         /// </summary>
         public string Description
         {
-            get { return description; }
+            get => description;
 
             set
             {
@@ -78,7 +78,7 @@ namespace TimelineCreator
         /// </summary>
         public TimeZoneInfo TimeZone
         {
-            get { return timeZone; }
+            get => timeZone;
 
             set
             {
@@ -91,6 +91,36 @@ namespace TimelineCreator
         /// The <see cref="TimelineCreator.Timeline"/> control that the tab is using to render the document's timeline.
         /// </summary>
         public readonly Timeline Timeline;
+
+        public int TimelineWidth
+        {
+            get => Timeline.TimelineWidth;
+            set => Timeline.TimelineWidth = value;
+        }
+
+        private bool tZeroMode = false;
+        public bool TZeroMode
+        {
+            get => tZeroMode;
+
+            set
+            {
+                tZeroMode = value;
+                Timeline.TZeroTime = value ? TZeroTime : null;
+            }
+        }
+
+        private DateTime? tZeroTime = null;
+        public DateTime? TZeroTime
+        {
+            get => tZeroTime;
+
+            set
+            {
+                tZeroTime = value;
+                Timeline.TZeroTime = TZeroMode ? value : null;
+            }
+        }
 
 
         private TimelineTab(bool isFromFile)

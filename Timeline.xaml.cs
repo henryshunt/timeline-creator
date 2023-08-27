@@ -29,7 +29,7 @@ namespace TimelineCreator
         /// </summary>
         public int TimelineWidth
         {
-            get { return timelineWidth; }
+            get => timelineWidth;
 
             set
             {
@@ -51,7 +51,8 @@ namespace TimelineCreator
         private TimelineItem? selectedItem = null;
         public TimelineItem? SelectedItem
         {
-            get { return selectedItem; }
+            get => selectedItem;
+
             set
             {
                 if (value != selectedItem)
@@ -88,7 +89,7 @@ namespace TimelineCreator
         /// </summary>
         public DateTime? TZeroTime
         {
-            get { return tZeroTime; }
+            get => tZeroTime;
 
             set
             {
@@ -473,10 +474,7 @@ namespace TimelineCreator
         /// Calculates the actual width that the timeline itself should take up within the control. Determined by 
         /// <see cref="TimelineWidth"/>.
         /// </summary>
-        private double CalcTimelineWidthFromPct()
-        {
-            return (TimelineWidth * ActualWidth) / 100;
-        }
+        private double CalcTimelineWidthFromPct() => (TimelineWidth * ActualWidth) / 100;
 
         /// <summary>
         /// Determines the appropriate time between tick lines based on the total time covered by the view.

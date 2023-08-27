@@ -14,7 +14,8 @@ namespace TimelineCreator
         private DateTime dateTime = DateTime.Now;
         public DateTime DateTime
         {
-            get { return dateTime; }
+            get => dateTime;
+
             set
             {
                 dateTime = value;
@@ -27,7 +28,8 @@ namespace TimelineCreator
         private string text = string.Empty;
         public string Text
         {
-            get { return text; }
+            get => text;
+
             set
             {
                 text = value;
@@ -40,7 +42,8 @@ namespace TimelineCreator
         private bool isSelected = false;
         internal bool IsSelected
         {
-            get { return isSelected; }
+            get => isSelected;
+
             set
             {
                 isSelected = value;
@@ -55,7 +58,7 @@ namespace TimelineCreator
         /// </summary>
         internal DateTime? TZeroTime
         {
-            get { return tZeroTime; }
+            get => tZeroTime;
 
             set
             {
