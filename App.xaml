@@ -34,7 +34,7 @@
         <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
 
-        <Style x:Key="TabControlStyle1" TargetType="{x:Type TabControl}">
+        <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
             <Setter Property="Padding" Value="2"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -126,7 +126,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
 
         <Style x:Key="ExpanderDownHeaderStyle" TargetType="{x:Type ToggleButton}">
             <Setter Property="Template">

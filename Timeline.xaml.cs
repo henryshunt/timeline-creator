@@ -128,12 +128,12 @@ namespace TimelineCreator
             DateTime now = DateTime.Now;
             viewStartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
             viewEndTime = viewStartTime + TimeSpan.FromDays(1);
+
+            Items.CollectionChanged += Items_CollectionChanged;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Items.CollectionChanged += Items_CollectionChanged;
-
             theGrid.MaxWidth = CalcTimelineWidthFromPct();
             Render();
         }
@@ -156,6 +156,7 @@ namespace TimelineCreator
             {
                 TimelineItem item = (TimelineItem)e.NewItems![0]!;
                 item.TZeroTime = TZeroTime;
+                item.PropertyChanged += Item_PropertyChanged;
 
                 if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
                 {
@@ -165,6 +166,7 @@ namespace TimelineCreator
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 TimelineItem item = (TimelineItem)e.OldItems![0]!;
+                item.PropertyChanged -= Item_PropertyChanged;
 
                 if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
                 {
@@ -176,6 +178,11 @@ namespace TimelineCreator
                     SelectedItem = null;
                 }
             }
+        }
+
+        private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            Render();
         }
 
         #region Rendering

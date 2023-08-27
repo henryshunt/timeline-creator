@@ -12,7 +12,7 @@
     </Window.Resources>
 
     <Grid>
-        <TabControl x:Name="theTabControl" Style="{DynamicResource TabControlStyle1}" Grid.Column="1" BorderThickness="0,0,0,1" SelectionChanged="TheTabControl_SelectionChanged" TabStripPlacement="Bottom"/>
+        <TabControl x:Name="theTabControl" Style="{DynamicResource TabControlStyle}" Grid.Column="1" BorderThickness="0,0,0,1" SelectionChanged="TheTabControl_SelectionChanged" TabStripPlacement="Bottom"/>
 
         <Border Padding="10" VerticalAlignment="Top" HorizontalAlignment="Left" Background="White" Width="392.82">
             <StackPanel>
