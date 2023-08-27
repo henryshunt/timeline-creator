@@ -114,6 +114,7 @@ namespace TimelineCreator
         private double secondsPerPixel = 0;
 
         private bool isMouseDown = false;
+        private TimelineItem? mouseDownItem = null;
         private Point dragStartPos = new(0, 0);
         private DateTime dragViewStartTime = DateTime.UtcNow;
         private DateTime dragViewEndTime = DateTime.UtcNow;
@@ -325,51 +326,12 @@ namespace TimelineCreator
                 yPosition - item.GetMarkerCenterPos().Y, 0, 0);
             item.HorizontalAlignment = HorizontalAlignment.Left;
 
-            // TODO: Do these need to be removed at the start of a render?
-            item.MouseLeftButtonUp += TimelineItem_MouseLeftButtonUp;
-            item.MouseLeftButtonDown += TimelineItem_MouseLeftButtonDown;
+            // TODO: Does this need to be removed at the start of a render?
+            item.MouseDown += TimelineItem_MouseDown;
         }
         #endregion
 
-        private void TimelineItem_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            SelectedItem = (TimelineItem)sender;
-            ((TimelineItem)sender).Focus();
-            e.Handled = true;
-        }
-
-        private void TimelineItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
         #region Pan & Zoom
-        /// <summary>
-        /// Resets the view range to show all items on the timeline.
-        /// </summary>
-        public void ResetZoom()
-        {
-            if (Items.Count == 0)
-            {
-                // Default view range is start of current day to start of next day
-                DateTime now = DateTime.Now;
-                viewStartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
-                viewEndTime = viewStartTime + TimeSpan.FromDays(1);
-            }
-            else if (Items.Count == 1)
-            {
-                viewStartTime = Items[0].DateTime - TimeSpan.FromMinutes(30);
-                viewEndTime = Items[0].DateTime + TimeSpan.FromMinutes(30);
-            }
-            else
-            {
-                viewStartTime = Items.Min(x => x.DateTime);
-                viewEndTime = Items.Max(x => x.DateTime);
-            }
-
-            Render();
-        }
-
         /// <summary>
         /// Sets the view range to a specific start and end time.
         /// </summary>
@@ -381,7 +343,7 @@ namespace TimelineCreator
         }
 
         /// <summary>
-        /// Gets the start and end times that define the current view range.
+        /// Gets the start and end time that defines the current view range.
         /// </summary>
         public (DateTime, DateTime) GetViewRange()
         {
@@ -412,6 +374,40 @@ namespace TimelineCreator
             Render();
         }
 
+        /// <summary>
+        /// Resets the view range to show all items on the timeline.
+        /// </summary>
+        public void ResetZoom()
+        {
+            if (Items.Count == 0)
+            {
+                // Default view range is start of current day to start of next day
+                DateTime now = DateTime.Now;
+                viewStartTime = new DateTime(now.Year, now.Month, now.Day, 0, 0, 0);
+                viewEndTime = viewStartTime + TimeSpan.FromDays(1);
+            }
+            else if (Items.Count == 1)
+            {
+                viewStartTime = Items[0].DateTime - TimeSpan.FromMinutes(30);
+                viewEndTime = Items[0].DateTime + TimeSpan.FromMinutes(30);
+            }
+            else
+            {
+                viewStartTime = Items.Min(x => x.DateTime);
+                viewEndTime = Items.Max(x => x.DateTime);
+            }
+
+            Render();
+        }
+
+        private void TimelineItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && mouseDownItem == null)
+            {
+                mouseDownItem = (TimelineItem)sender;
+            }
+        }
+
         private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
@@ -430,8 +426,6 @@ namespace TimelineCreator
         {
             if (isMouseDown)
             {
-                hasDragged = true;
-
                 double posDelta = e.GetPosition(theGrid).Y - dragStartPos.Y;
                 TimeSpan timeDelta = TimeSpan.FromSeconds(posDelta * secondsPerPixel);
 
@@ -439,11 +433,13 @@ namespace TimelineCreator
                 {
                     viewStartTime = dragViewStartTime - timeDelta;
                     viewEndTime = dragViewEndTime - timeDelta;
+                    hasDragged = true;
                 }
                 else
                 {
                     viewStartTime = dragViewStartTime;
                     viewEndTime = dragViewEndTime;
+                    hasDragged = false;
                 }
 
                 Render();
@@ -454,14 +450,16 @@ namespace TimelineCreator
         {
             if (e.ChangedButton == MouseButton.Left)
             {
+                if (!hasDragged)
+                {
+                    // Select clicked item or deselect item if background clicked
+                    SelectedItem = mouseDownItem != null ? mouseDownItem : null;
+                }
+
                 isMouseDown = false;
                 theGrid.ReleaseMouseCapture();
+                mouseDownItem = null;
                 e.Handled = true;
-
-                if (!hasDragged && e.OriginalSource == theGrid)
-                {
-                    SelectedItem = null;
-                }
             }
             else if (e.ChangedButton == MouseButton.Middle)
             {
