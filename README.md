@@ -11,9 +11,9 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Select an item, then select another item with the control key held. This will display the time difference between the two items.
 
 # Shortcuts
-- Ctrl-N -- Create a new document
-- Ctrl-O -- Open a document
-- Ctrl-S -- Save the open document
+- Ctrl-N -- Create a new timeline document
+- Ctrl-O -- Open an existing timeline document
+- Ctrl-S -- Save the open timeline document
 - Click & Drag -- Move up or down the timeline
 - Home -- Move timeline view to start at first item
 - End -- Move timeline view to end at last item
@@ -21,3 +21,4 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
 - Delete -- Delete selected item
 - Esc -- Deselect selected item
+- Double-click background to open the new item box
