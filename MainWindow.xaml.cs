@@ -338,12 +338,18 @@ namespace TimelineCreator
 
         private void Timeline_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
+            // Calculate time difference if control-clicking on two items
             if (e.AddedItems.Count == 1 && e.RemovedItems.Count == 1 &&
                 Keyboard.Modifiers == ModifierKeys.Control)
             {
+                // If we don't do this, a stack overflow will happen because the line after this
+                // will invoke SelectionChanged again, and the condition above will match again, which
+                // will invoke it again, and so on.
+                ((Timeline)sender!).SelectedItem = null;
+
+                ((Timeline)sender!).SelectedItem = (TimelineItem)e.RemovedItems[0]!;
                 TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime - ((TimelineItem)e.RemovedItems[0]!).DateTime;
                 MessageBox.Show($"Difference is {diff.Duration().ToString("h'h 'm'm 's's'")}");
-                //((Timeline)sender!).SelectedItem = null;
             }
         }
 

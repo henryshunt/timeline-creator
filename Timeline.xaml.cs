@@ -65,18 +65,18 @@ namespace TimelineCreator
                     TimelineItem? oldItem = selectedItem;
                     selectedItem = value;
 
-                    if (selectedItem == null)
+                    if (value == null)
                     {
                         SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(Selector.SelectionChangedEvent,
                             new List<TimelineItem>() { oldItem! }, new List<TimelineItem>() { }));
                     }
                     else
                     {
+                        value.IsSelected = true;
+
                         List<TimelineItem> removedItems = (oldItem != null) ? new() { oldItem } : new() { };
                         SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(Selector.SelectionChangedEvent,
-                            removedItems, new List<TimelineItem>() { selectedItem }));
-
-                        selectedItem.IsSelected = true;
+                            removedItems, new List<TimelineItem>() { value }));
                     }
                 }
             }
