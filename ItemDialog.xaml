@@ -30,12 +30,6 @@
             </Grid>
 
             <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="Auto" Grid.Row="2" MaxLines="1"/>
-
-            <!--<StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                <RadioButton Style="{DynamicResource ColouredRadioButtonStyle}" Margin="0,0,5,0" Background="SlateGray" IsChecked="True"/>
-                <RadioButton Style="{DynamicResource ColouredRadioButtonStyle}" Margin="0,0,5,0" Background="Coral"/>
-                <RadioButton Style="{DynamicResource ColouredRadioButtonStyle}" Background="Purple"/>
-            </StackPanel>-->
         </Grid>
 
         <Border Background="LightGray" Grid.Row="1">
