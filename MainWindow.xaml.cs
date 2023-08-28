@@ -23,7 +23,6 @@ namespace TimelineCreator
 
             //TimelineTab tab = TimelineTab.OpenDocument(
             //    "C:/Users/Henry/Documents/Timelines/B9 Static Fire 2023-08-25.json");
-            //tab.ContextMenu = Resources["tabContextMenu"] as ContextMenu;
             //theTabControl.Items.Add(tab);
 
             theTabControl.Items.Add(TimelineTab.NewDocument());
@@ -367,20 +366,6 @@ namespace TimelineCreator
                 e.Handled = true; // Prevents dragging happening when moving mouse after dialog closes
                 AddItemButton_Click(this, new RoutedEventArgs());
             }
-        }
-
-        private void CloseTabMenu_Click(object sender, RoutedEventArgs e)
-        {
-            TimelineTab tab = (TimelineTab)sender;
-            int tabIndex = theTabControl.Items.IndexOf(tab);
-            theTabControl.Items.Remove(tab);
-
-            if (theTabControl.Items.Count == 0)
-                theTabControl.SelectedItem = null;
-            else if (theTabControl.Items.Count >= tabIndex)
-                theTabControl.SelectedIndex = tabIndex;
-            else if (theTabControl.Items.Count - 1 == tabIndex)
-                theTabControl.SelectedIndex = tabIndex - 1;
         }
         #endregion
     }
