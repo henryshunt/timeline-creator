@@ -30,7 +30,7 @@ namespace TimelineCreator
             {
                 if (tab.HasUnsavedChanges)
                 {
-                    if (MessageBox.Show("You have unsaved changes. Continue?", "",
+                    if (MessageBox.Show("You have unsaved changes. Continue?", string.Empty,
                         MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                     {
                         e.Cancel = true;
@@ -163,9 +163,16 @@ namespace TimelineCreator
             if (GetSelectedTab().FilePath == null)
             {
                 string fileName = docTitleTextBox.Text;
-                foreach (char c in Path.GetInvalidFileNameChars())
+                if (fileName != string.Empty)
                 {
-                    fileName = fileName.Replace(c, '-');
+                    foreach (char c in Path.GetInvalidFileNameChars())
+                    {
+                        fileName = fileName.Replace(c, '-');
+                    }
+                }
+                else
+                {
+                    fileName = "Untitled Timeline";
                 }
 
                 SaveFileDialog saveDialog = new()
@@ -234,7 +241,7 @@ namespace TimelineCreator
         {
             if (GetSelectedTab().HasUnsavedChanges)
             {
-                if (MessageBox.Show("You have unsaved changes. Continue?", "",
+                if (MessageBox.Show("You have unsaved changes. Continue?", string.Empty,
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                 {
                     return;
@@ -276,6 +283,7 @@ namespace TimelineCreator
         private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             GetSelectedTab().Title = ((TextBox)sender).Text;
+            Title = $"{GetSelectedTab().Header} - Timeline Creator";
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -321,7 +329,7 @@ namespace TimelineCreator
             if (e.AddedItems.Count > 0)
             {
                 TimelineTab addedTab = (TimelineTab)e.AddedItems[0]!;
-                Title = $"{addedTab.Title} - Timeline Creator";
+                Title = $"{addedTab.Header} - Timeline Creator";
 
                 widthSlider.Value = addedTab.TimelineWidth;
                 t0TimeField.Value = addedTab.TZeroTime;

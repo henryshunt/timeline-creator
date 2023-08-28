@@ -32,8 +32,15 @@ namespace TimelineCreator
             {
                 hasUnsavedChanges = value;
 
-                // Add an asterisk to the displayed title of the tab
-                Header = hasUnsavedChanges ? $"* {Title}" : Title;
+                // Include an asterisk in the tab header if there are unsaved changes
+                if (hasUnsavedChanges)
+                {
+                    Header = Title == string.Empty ? "* Untitled Timeline" : $"* {Title}";
+                }
+                else
+                {
+                    Header = Title == string.Empty ? "Untitled Timeline" : Title;
+                }
             }
         }
 
@@ -43,7 +50,7 @@ namespace TimelineCreator
         /// </summary>
         public string? FilePath { get; private set; } = null;
 
-        private string title = "Untitled Document";
+        private string title = "Untitled Timeline";
 
         /// <summary>
         /// Title of the document.
@@ -59,7 +66,7 @@ namespace TimelineCreator
             }
         }
 
-        private string description = "";
+        private string description = string.Empty;
 
         /// <summary>
         /// Description section of the document.
@@ -180,10 +187,12 @@ namespace TimelineCreator
 
                 TimelineTab tab = new(true)
                 {
-                    title = documentJson["title"],
-                    description = documentJson["description"],
-                    timeZone = timeZone
+                    Title = documentJson["title"],
+                    Description = documentJson["description"],
+                    TimeZone = timeZone
                 };
+
+                tab.HasUnsavedChanges = false;
 
                 foreach (dynamic itemJson in documentJson.items)
                 {
@@ -208,7 +217,6 @@ namespace TimelineCreator
                 tab.Timeline.ResetZoom();
 
                 tab.FilePath = filePath;
-                tab.Header = tab.Title;
                 return tab;
             }
             else
