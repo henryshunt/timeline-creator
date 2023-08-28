@@ -22,25 +22,25 @@ namespace TimelineCreator
         private const double START_END_PADDING = 15;
 
 
-        private int timelineWidth = 100;
+        private int maxTimelineWidth = 800;
 
         /// <summary>
-        /// Percentage of the width of the control that the timeline itself takes up.
+        /// Maximum width of the timeline itself within the control.
         /// </summary>
-        public int TimelineWidth
+        public int MaxTimelineWidth
         {
-            get => timelineWidth;
+            get => maxTimelineWidth;
 
             set
             {
-                if (value < 0 || value > 100)
+                if (value < 0)
                     throw new ArgumentOutOfRangeException();
 
-                timelineWidth = value;
+                maxTimelineWidth = value;
 
                 if (IsLoaded)
                 {
-                    theGrid.MaxWidth = CalcTimelineWidthFromPct();
+                    theGrid.MaxWidth = value;
                     Render();
                 }
             }
@@ -136,13 +136,13 @@ namespace TimelineCreator
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            theGrid.MaxWidth = CalcTimelineWidthFromPct();
+            theGrid.MaxWidth = MaxTimelineWidth;
             Render();
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            theGrid.MaxWidth = CalcTimelineWidthFromPct();
+            theGrid.MaxWidth = MaxTimelineWidth;
             Render();
         }
 
@@ -470,12 +470,6 @@ namespace TimelineCreator
         #endregion
 
         #region Helpers
-        /// <summary>
-        /// Calculates the actual width that the timeline itself should take up within the control. Determined by 
-        /// <see cref="TimelineWidth"/>.
-        /// </summary>
-        private double CalcTimelineWidthFromPct() => (TimelineWidth * ActualWidth) / 100;
-
         /// <summary>
         /// Determines the appropriate time between tick lines based on the total time covered by the view.
         /// </summary>

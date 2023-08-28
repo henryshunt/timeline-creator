@@ -101,15 +101,7 @@ namespace TimelineCreator
         {
             if (value != null && (string)value != string.Empty)
             {
-                try
-                {
-                    return DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
-                }
-                catch (FormatException)
-                {
-                    // ValidationRule nominally prevents this return path
-                    return null;
-                }
+                return DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
             }
             else
             {
@@ -126,7 +118,6 @@ namespace TimelineCreator
             {
                 try
                 {
-                    // TODO: Add time zone property and check if value is valid in that zone
                     DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
                     return new ValidationResult(true, null);
                 }

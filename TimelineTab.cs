@@ -105,8 +105,8 @@ namespace TimelineCreator
 
         public int TimelineWidth
         {
-            get => Timeline.TimelineWidth;
-            set => Timeline.TimelineWidth = value;
+            get => Timeline.MaxTimelineWidth;
+            set => Timeline.MaxTimelineWidth = value;
         }
 
         private bool tZeroMode = false;
@@ -140,7 +140,7 @@ namespace TimelineCreator
             {
                 Margin = new Thickness(10),
                 FontSize = 14,
-                TimelineWidth = 30
+                MaxTimelineWidth = 800
             };
 
             if (!isFromFile)

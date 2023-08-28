@@ -265,9 +265,9 @@ namespace TimelineCreator
             }
         }
 
-        private void WidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void WidthNumeric_ValueChanged(object? sender, NumericValueChangedEventArgs e)
         {
-            GetSelectedTab().TimelineWidth = (int)Math.Round(((Slider)sender).Value);
+            GetSelectedTab().TimelineWidth = ((NumericField)sender!).Value;
         }
 
         private void T0TimeField_ValueChanged(object? sender, DateTimeValueChangedEventArgs e)
@@ -305,7 +305,7 @@ namespace TimelineCreator
             if (e.RemovedItems.Count > 0)
             {
                 TimelineTab removedTab = (TimelineTab)e.RemovedItems[0]!;
-                widthSlider.ValueChanged -= WidthSlider_ValueChanged;
+                widthNumeric.ValueChanged -= WidthNumeric_ValueChanged;
                 t0TimeField.ValueChanged -= T0TimeField_ValueChanged;
                 t0ModeCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
                 t0ModeCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
@@ -317,7 +317,7 @@ namespace TimelineCreator
                 if (e.AddedItems.Count > 0)
                 {
                     Title = "Timeline Creator";
-                    widthSlider.Value = 0;
+                    widthNumeric.Value = 0;
                     t0TimeField.Value = null;
                     t0ModeCheckBox.IsChecked = false;
                     docTitleTextBox.Text = null;
@@ -331,14 +331,14 @@ namespace TimelineCreator
                 TimelineTab addedTab = (TimelineTab)e.AddedItems[0]!;
                 Title = $"{addedTab.Header} - Timeline Creator";
 
-                widthSlider.Value = addedTab.TimelineWidth;
+                widthNumeric.Value = addedTab.TimelineWidth;
                 t0TimeField.Value = addedTab.TZeroTime;
                 t0ModeCheckBox.IsChecked = addedTab.TZeroMode;
                 docTitleTextBox.Text = addedTab.Title;
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
 
-                widthSlider.ValueChanged += WidthSlider_ValueChanged;
+                widthNumeric.ValueChanged += WidthNumeric_ValueChanged;
                 t0TimeField.ValueChanged += T0TimeField_ValueChanged;
                 t0ModeCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
                 t0ModeCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
