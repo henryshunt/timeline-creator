@@ -21,12 +21,7 @@ namespace TimelineCreator
             timeZoneComboBox.ItemsSource = TimeZoneInfo.GetSystemTimeZones();
             timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
 
-            //TimelineTab tab = TimelineTab.OpenDocument(
-            //    "C:/Users/Henry/Documents/Timelines/B9 Static Fire 2023-08-25.json");
-            //theTabControl.Items.Add(tab);
-
-            theTabControl.Items.Add(TimelineTab.NewDocument());
-            theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
+            NewButton_Click(this, new RoutedEventArgs());
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -106,7 +101,11 @@ namespace TimelineCreator
         #region Main Controls
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
-            theTabControl.Items.Add(TimelineTab.NewDocument());
+            TimelineTab newTab = TimelineTab.NewDocument();
+            newTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
+            newTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
+
+            theTabControl.Items.Add(newTab);
             theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
         }
 
@@ -122,6 +121,8 @@ namespace TimelineCreator
                 try
                 {
                     TimelineTab newTab = await TimelineTab.OpenDocument(openDialog.FileName);
+                    newTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
+                    newTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
 
                     // If a single new, empty document is open then remove it
                     if (theTabControl.Items.Count == 1 &&
@@ -296,25 +297,25 @@ namespace TimelineCreator
             if (e.RemovedItems.Count > 0)
             {
                 TimelineTab removedTab = (TimelineTab)e.RemovedItems[0]!;
-                Title = "Timeline Creator";
-
-                removedTab.Timeline.SelectedItem = null;
-                removedTab.Timeline.SelectionChanged -= Timeline_SelectionChanged;
-                removedTab.Timeline.MouseDoubleClick -= Timeline_PreviewMouseDoubleClick;
-
                 widthSlider.ValueChanged -= WidthSlider_ValueChanged;
-                widthSlider.Value = 0;
                 t0TimeField.ValueChanged -= T0TimeField_ValueChanged;
-                t0TimeField.Value = null;
                 t0ModeCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
                 t0ModeCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
-                t0ModeCheckBox.IsChecked = false;
                 docTitleTextBox.TextChanged -= DocTitleTextBox_TextChanged;
-                docTitleTextBox.Text = null;
                 docDescripTextBox.TextChanged -= DocDescripTextBox_TextChanged;
-                docDescripTextBox.Text = null;
                 timeZoneComboBox.SelectionChanged -= TimeZoneComboBox_SelectionChanged;
-                timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
+
+                // Only clear values if we're not immediately going to change them again below
+                if (e.AddedItems.Count > 0)
+                {
+                    Title = "Timeline Creator";
+                    widthSlider.Value = 0;
+                    t0TimeField.Value = null;
+                    t0ModeCheckBox.IsChecked = false;
+                    docTitleTextBox.Text = null;
+                    docDescripTextBox.Text = null;
+                    timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
+                }
             }
 
             if (e.AddedItems.Count > 0)
@@ -322,22 +323,35 @@ namespace TimelineCreator
                 TimelineTab addedTab = (TimelineTab)e.AddedItems[0]!;
                 Title = $"{addedTab.Title} - Timeline Creator";
 
-                addedTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
-                addedTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
-
                 widthSlider.Value = addedTab.TimelineWidth;
-                widthSlider.ValueChanged += WidthSlider_ValueChanged;
                 t0TimeField.Value = addedTab.TZeroTime;
-                t0TimeField.ValueChanged += T0TimeField_ValueChanged;
                 t0ModeCheckBox.IsChecked = addedTab.TZeroMode;
+                docTitleTextBox.Text = addedTab.Title;
+                docDescripTextBox.Text = addedTab.Description;
+                timeZoneComboBox.SelectedItem = addedTab.TimeZone;
+
+                widthSlider.ValueChanged += WidthSlider_ValueChanged;
+                t0TimeField.ValueChanged += T0TimeField_ValueChanged;
                 t0ModeCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
                 t0ModeCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
-                docTitleTextBox.Text = addedTab.Title;
                 docTitleTextBox.TextChanged += DocTitleTextBox_TextChanged;
-                docDescripTextBox.Text = addedTab.Description;
                 docDescripTextBox.TextChanged += DocDescripTextBox_TextChanged;
-                timeZoneComboBox.SelectedItem = addedTab.TimeZone;
                 timeZoneComboBox.SelectionChanged += TimeZoneComboBox_SelectionChanged;
+            }
+        }
+
+        private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (((Timeline)sender).SelectedItem != null)
+            {
+                new ItemDialog((TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
+                {
+                    Owner = this
+                }.ShowDialog();
+            }
+            else
+            {
+                AddItemButton_Click(this, new RoutedEventArgs());
             }
         }
 
@@ -355,21 +369,6 @@ namespace TimelineCreator
                 ((Timeline)sender!).SelectedItem = (TimelineItem)e.RemovedItems[0]!;
                 TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime - ((TimelineItem)e.RemovedItems[0]!).DateTime;
                 MessageBox.Show($"Difference is {diff.Duration().ToString("h'h 'm'm 's's'")}");
-            }
-        }
-
-        private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (((Timeline)sender).SelectedItem != null)
-            {
-                new ItemDialog((TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
-                {
-                    Owner = this
-                }.ShowDialog();
-            }
-            else
-            {
-                AddItemButton_Click(this, new RoutedEventArgs());
             }
         }
         #endregion
