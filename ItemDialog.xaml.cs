@@ -17,7 +17,7 @@ namespace TimelineCreator
 
             Item = new TimelineItem()
             {
-                DateTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timeZone.Id)
+                DateTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(UtcNowNoMillis(), timeZone.Id)
             };
 
             InitializeComponent();
@@ -57,7 +57,7 @@ namespace TimelineCreator
 
         private void NowButton_Click(object sender, RoutedEventArgs e)
         {
-            theTimeField.Value = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.UtcNow, timeZone.Id);
+            theTimeField.Value = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(UtcNowNoMillis(), timeZone.Id);
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
@@ -65,6 +65,13 @@ namespace TimelineCreator
             Item.DateTime = (DateTime)theTimeField.Value!;
             Item.Text = theTextBox.Text;
             DialogResult = true;
+        }
+
+        private static DateTime UtcNowNoMillis()
+        {
+            DateTime now = DateTime.UtcNow;
+            return new DateTime(now.Year, now.Month, now.Day,
+                now.Hour, now.Minute, now.Second, now.Kind);
         }
     }
 }

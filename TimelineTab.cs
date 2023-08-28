@@ -1,12 +1,16 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using JsonSchema = NJsonSchema.JsonSchema;
 
 namespace TimelineCreator
 {
@@ -152,39 +156,83 @@ namespace TimelineCreator
         /// <summary>
         /// Creates a tab containing the contents of an existing timeline document.
         /// </summary>
-        public static TimelineTab OpenDocument(string filePath)
+        public async static Task<TimelineTab> OpenDocument(string filePath)
         {
-            // TODO: Validation of file contents before reading
+            string json = File.ReadAllText(filePath);
 
-            dynamic documentJson = JObject.Parse(File.ReadAllText(filePath));
-
-            TimelineTab tab = new(true)
+            if (await ValidateJson(json))
             {
-                title = documentJson["title"],
-                description = documentJson["description"],
+                dynamic documentJson = JsonConvert.DeserializeObject<JObject>(json,
+                    new JsonSerializerSettings() { DateParseHandling = DateParseHandling.None })!;
 
-                timeZone = TimeZoneInfo.GetSystemTimeZones()
-                    .First(tzi => tzi.Id == (string)documentJson.timeZone)
-            };
-
-            foreach (dynamic itemJson in documentJson.items)
-            {
-                TimelineItem item = new()
+                if (documentJson.version != 1)
                 {
-                    DateTime = DateTime.ParseExact((string)itemJson.time, "MM/dd/yyyy HH:mm:ss", null),
-                    Text = itemJson.text
+                    throw new InvalidFileException();
+                }
+
+                TimeZoneInfo? timeZone = TimeZoneInfo.GetSystemTimeZones()
+                    .FirstOrDefault(tzi => tzi.Id == (string)documentJson.timeZone);
+
+                if (timeZone == null)
+                {
+                    throw new InvalidFileException();
+                }
+
+                TimelineTab tab = new(true)
+                {
+                    title = documentJson["title"],
+                    description = documentJson["description"],
+                    timeZone = timeZone
                 };
 
-                tab.AddPropertyChangedHandler(item);
-                tab.Timeline.Items.Add(item);
+                foreach (dynamic itemJson in documentJson.items)
+                {
+                    try
+                    {
+                        TimelineItem item = new()
+                        {
+                            DateTime = DateTime.ParseExact((string)itemJson.time, "yyyy-MM-dd'T'HH:mm:ss", null),
+                            Text = itemJson.text
+                        };
+
+                        tab.AddPropertyChangedHandler(item);
+                        tab.Timeline.Items.Add(item);
+                    }
+                    catch (FormatException)
+                    {
+                        throw new InvalidFileException();
+                    }
+                }
+
+                tab.AddCollectionChangedHandler();
+                tab.Timeline.ResetZoom();
+
+                tab.FilePath = filePath;
+                tab.Header = tab.Title;
+                return tab;
+            }
+            else
+            {
+                throw new InvalidFileException();
+            }
+        }
+
+        private static async Task<bool> ValidateJson(string json)
+        {
+            string schemaJson;
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
+                "TimelineCreator.FileSchema.json")!)
+            {
+                using (StreamReader reader = new(stream))
+                {
+                    schemaJson = reader.ReadToEnd();
+                }
             }
 
-            tab.AddCollectionChangedHandler();
-            tab.Timeline.ResetZoom();
+            JsonSchema schema = await JsonSchema.FromJsonAsync(schemaJson);
+            ICollection<NJsonSchema.Validation.ValidationError> jsonErrors = schema.Validate(json);
 
-            tab.FilePath = filePath;
-            tab.Header = tab.Title;
-            return tab;
+            return jsonErrors.Count == 0;
         }
 
         /// <summary>
@@ -205,6 +253,7 @@ namespace TimelineCreator
                 throw new InvalidOperationException("Document has never been saved.");
 
             dynamic documentJson = new JObject();
+            documentJson.version = 1;
             documentJson.title = Title;
             documentJson.description = Description;
             documentJson.timeZone = TimeZone.Id;
@@ -218,7 +267,13 @@ namespace TimelineCreator
                 documentJson.items.Add(itemJson);
             }
 
-            File.WriteAllText(FilePath, JsonConvert.SerializeObject(documentJson, Formatting.Indented));
+            JsonSerializerSettings settings = new()
+            {
+                Formatting = Formatting.Indented,
+                DateFormatString = "yyyy-MM-dd'T'HH:mm:ss"
+            };
+
+            File.WriteAllText(FilePath, JsonConvert.SerializeObject(documentJson, settings));
             HasUnsavedChanges = false;
         }
 
@@ -257,5 +312,10 @@ namespace TimelineCreator
             // Invoked whenever item time or text changes
             HasUnsavedChanges = true;
         }
+    }
+
+    public class InvalidFileException : Exception
+    {
+
     }
 }

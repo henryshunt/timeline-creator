@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    
+    "properties": {
+        "version": { "type": "number", "minimum": 1 },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "timeZone": { "type": "string", "minLength": 1 },
+        
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "time": { "type": "string", "minLength": 19, "maxLength": 19 },
+                    "text": { "type": "string" }
+                },
+                
+                "required": [ "time", "text" ]
+            }
+        }
+    },
+    
+    "required": [ "version", "title", "description", "timeZone", "items" ]
+}

@@ -2,10 +2,10 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Linq;
 
 namespace TimelineCreator
 {
@@ -110,7 +110,7 @@ namespace TimelineCreator
             theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
         }
 
-        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        private async void OpenButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openDialog = new()
             {
@@ -121,6 +121,8 @@ namespace TimelineCreator
             {
                 try
                 {
+                    TimelineTab newTab = await TimelineTab.OpenDocument(openDialog.FileName);
+
                     // If a single new, empty document is open then remove it
                     if (theTabControl.Items.Count == 1 &&
                         ((TimelineTab)theTabControl.Items[0]).HasUnsavedChanges == false &&
@@ -141,12 +143,16 @@ namespace TimelineCreator
                         }
                     }
 
-                    theTabControl.Items.Add(TimelineTab.OpenDocument(openDialog.FileName));
+                    theTabControl.Items.Add(newTab);
                     theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
                 }
                 catch (IOException)
                 {
                     MessageBox.Show("Error opening file.");
+                }
+                catch (InvalidFileException)
+                {
+                    MessageBox.Show("File contents are invalid.");
                 }
             }
         }
