@@ -294,7 +294,7 @@ namespace TimelineCreator
 
                 removedTab.Timeline.SelectedItem = null;
                 removedTab.Timeline.SelectionChanged -= Timeline_SelectionChanged;
-                removedTab.Timeline.MouseDoubleClick -= Timeline_MouseDoubleClick;
+                removedTab.Timeline.MouseDoubleClick -= Timeline_PreviewMouseDoubleClick;
 
                 widthSlider.ValueChanged -= WidthSlider_ValueChanged;
                 widthSlider.Value = 0;
@@ -317,7 +317,7 @@ namespace TimelineCreator
                 Title = $"{addedTab.Title} - Timeline Creator";
 
                 addedTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
-                addedTab.Timeline.MouseDoubleClick += Timeline_MouseDoubleClick;
+                addedTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
 
                 widthSlider.Value = addedTab.TimelineWidth;
                 widthSlider.ValueChanged += WidthSlider_ValueChanged;
@@ -352,7 +352,7 @@ namespace TimelineCreator
             }
         }
 
-        private void Timeline_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (((Timeline)sender).SelectedItem != null)
             {
@@ -363,7 +363,6 @@ namespace TimelineCreator
             }
             else
             {
-                e.Handled = true; // Prevents dragging happening when moving mouse after dialog closes
                 AddItemButton_Click(this, new RoutedEventArgs());
             }
         }
