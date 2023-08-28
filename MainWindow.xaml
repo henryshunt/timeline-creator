@@ -45,7 +45,7 @@
                 </Grid>
 
                 <StackPanel Margin="0,10,0,0">
-                    <Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0">
+                    <Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0" SnapsToDevicePixels="True">
                         <Expander.Header>
                             <TextBlock Text="Document Properties" FontWeight="Bold" Margin="0,-1,0,0"/>
                         </Expander.Header>
