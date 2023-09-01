@@ -11,7 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace TimelineCreator
+namespace TimelineCreator.Controls
 {
     public partial class Timeline : UserControl
     {

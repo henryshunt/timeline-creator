@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TimelineCreator.ItemDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:TimelineCreator"
+        xmlns:local="clr-namespace:TimelineCreator.Controls"
         
         Title="Add Item to Timeline" Height="220" Width="360" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
 

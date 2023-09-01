@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace TimelineCreator
+namespace TimelineCreator.Controls
 {
     public partial class NumericField : UserControl, INotifyPropertyChanged
     {

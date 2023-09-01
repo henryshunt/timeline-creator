@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using TimelineCreator.Controls;
 using JsonSchema = NJsonSchema.JsonSchema;
 
 namespace TimelineCreator

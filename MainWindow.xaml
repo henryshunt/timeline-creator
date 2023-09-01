@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TimelineCreator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:TimelineCreator"
+        xmlns:local="clr-namespace:TimelineCreator.Controls"
         
         Title="Timeline Renderer" Height="800" Width="800" WindowState="Maximized" Loaded="Window_Loaded" KeyDown="Window_KeyDown" Closing="Window_Closing" MinWidth="409">
 
