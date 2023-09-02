@@ -27,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\TZeroTimeField.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Controls\NumericField.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

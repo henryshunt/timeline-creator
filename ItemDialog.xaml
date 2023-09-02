@@ -25,7 +25,8 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <local:DateTimeField x:Name="theTimeField" ValueChanged="TheTimeField_ValueChanged" ValidationError="TheTimeField_ValidationError"/>
+                <local:DateTimeField x:Name="theTimeField" ValueChanged="TheTimeField_ValueChanged" ValidationError="Field_ValidationError"/>
+                <local:TZeroTimeField x:Name="theTZeroField" ValueChanged="TheTZeroField_ValueChanged" ValidationError="Field_ValidationError" Visibility="Collapsed"/>
                 <Button Content="Now" HorizontalAlignment="Right" Click="NowButton_Click" Grid.Column="2"/>
             </Grid>
 
@@ -34,8 +35,15 @@
 
         <Border Background="LightGray" Grid.Row="1">
             <Grid Margin="10">
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <Button x:Name="submitButton" Content="Add Item" Margin="0,0,10,0" Width="80" Click="SubmitButton_Click" IsDefault="True"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Enter time relative to T-0" Checked="TZeroCheckBox_CheckedChanged" Unchecked="TZeroCheckBox_CheckedChanged" IsEnabled="False"/>
+                
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="1">
+                    <Button x:Name="submitButton" Content="Add Item" Margin="0,0,5,0" Width="80" Click="SubmitButton_Click" IsDefault="True"/>
                     <Button Content="Cancel" IsCancel="True"/>
                 </StackPanel>
             </Grid>

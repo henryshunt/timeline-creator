@@ -18,7 +18,7 @@ namespace TimelineCreator.Controls
             set
             {
                 this.value = value;
-                theTextBox.Background = null;
+                theTextBox.Background = new SolidColorBrush(Colors.White);
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
                 ValueChanged?.Invoke(this, new NumericValueChangedEventArgs(value));
@@ -53,7 +53,7 @@ namespace TimelineCreator.Controls
             // Load the currently committed (valid) value back into textbox on focus loss
             ((TextBox)sender).GetBindingExpression(TextBox.TextProperty).UpdateTarget();
 
-            theTextBox.Background = null;
+            theTextBox.Background = new SolidColorBrush(Colors.White);
         }
     }
 

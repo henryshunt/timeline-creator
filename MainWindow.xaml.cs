@@ -27,17 +27,24 @@ namespace TimelineCreator
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            int unsavedCount = 0;
             foreach (TimelineTab tab in theTabControl.Items)
             {
                 if (tab.HasUnsavedChanges)
                 {
-                    if (MessageBox.Show("You have unsaved changes. Continue?", string.Empty,
-                        MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-                    {
-                        e.Cancel = true;
-                    }
+                    unsavedCount++;
+                }
+            }
 
-                    break;
+            if (unsavedCount > 0)
+            {
+                string message = $"You have unsaved changes on {unsavedCount} ";
+                message += (unsavedCount == 1 ? "tab" : "tabs") + ". Continue?";
+
+                if (MessageBox.Show(message, "Timeline Creator", MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning) == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
                 }
             }
         }
@@ -190,7 +197,7 @@ namespace TimelineCreator
                     }
                     catch (IOException)
                     {
-                        MessageBox.Show("Error saving file.");
+                        MessageBox.Show("Error saving file.", "Timeline Creator");
                     }
                 }
             }
@@ -202,7 +209,12 @@ namespace TimelineCreator
 
         private void AddItemButton_Click(object sender, RoutedEventArgs e)
         {
-            ItemDialog itemDialog = new((TimeZoneInfo)timeZoneComboBox.SelectedItem) { Owner = this };
+            ItemDialog itemDialog = new((TimeZoneInfo)timeZoneComboBox.SelectedItem)
+            {
+                TZeroTime = tZeroTimeField.Value,
+                IsTZeroMode = tZeroCheckBox.IsChecked == true,
+                Owner = this
+            };
 
             if (itemDialog.ShowDialog() == true)
             {
@@ -242,7 +254,7 @@ namespace TimelineCreator
         {
             if (GetSelectedTab().HasUnsavedChanges)
             {
-                if (MessageBox.Show("You have unsaved changes. Continue?", string.Empty,
+                if (MessageBox.Show("You have unsaved changes. Continue?", "Timeline Creator",
                     MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                 {
                     return;
@@ -273,7 +285,7 @@ namespace TimelineCreator
 
         private void T0TimeField_ValueChanged(object? sender, DateTimeValueChangedEventArgs e)
         {
-            GetSelectedTab().TZeroTime = t0TimeField.Value;
+            GetSelectedTab().TZeroTime = tZeroTimeField.Value;
         }
 
         private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
@@ -307,9 +319,9 @@ namespace TimelineCreator
             {
                 TimelineTab removedTab = (TimelineTab)e.RemovedItems[0]!;
                 widthNumeric.ValueChanged -= WidthNumeric_ValueChanged;
-                t0TimeField.ValueChanged -= T0TimeField_ValueChanged;
-                t0ModeCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
-                t0ModeCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
+                tZeroTimeField.ValueChanged -= T0TimeField_ValueChanged;
+                tZeroCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
+                tZeroCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
                 docTitleTextBox.TextChanged -= DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged -= DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged -= TimeZoneComboBox_SelectionChanged;
@@ -319,8 +331,8 @@ namespace TimelineCreator
                 {
                     Title = "Timeline Creator";
                     widthNumeric.Value = 0;
-                    t0TimeField.Value = null;
-                    t0ModeCheckBox.IsChecked = false;
+                    tZeroTimeField.Value = null;
+                    tZeroCheckBox.IsChecked = false;
                     docTitleTextBox.Text = null;
                     docDescripTextBox.Text = null;
                     timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
@@ -333,16 +345,16 @@ namespace TimelineCreator
                 Title = $"{addedTab.Header} - Timeline Creator";
 
                 widthNumeric.Value = addedTab.TimelineWidth;
-                t0TimeField.Value = addedTab.TZeroTime;
-                t0ModeCheckBox.IsChecked = addedTab.TZeroMode;
+                tZeroTimeField.Value = addedTab.TZeroTime;
+                tZeroCheckBox.IsChecked = addedTab.TZeroMode;
                 docTitleTextBox.Text = addedTab.Title;
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
 
                 widthNumeric.ValueChanged += WidthNumeric_ValueChanged;
-                t0TimeField.ValueChanged += T0TimeField_ValueChanged;
-                t0ModeCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
-                t0ModeCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
+                tZeroTimeField.ValueChanged += T0TimeField_ValueChanged;
+                tZeroCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
+                tZeroCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
                 docTitleTextBox.TextChanged += DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged += DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged += TimeZoneComboBox_SelectionChanged;
@@ -355,6 +367,8 @@ namespace TimelineCreator
             {
                 new ItemDialog((TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
                 {
+                    TZeroTime = tZeroTimeField.Value,
+                    IsTZeroMode = tZeroCheckBox.IsChecked == true,
                     Owner = this
                 }.ShowDialog();
             }
@@ -376,7 +390,9 @@ namespace TimelineCreator
                 ((Timeline)sender!).SelectedItem = null;
 
                 ((Timeline)sender!).SelectedItem = (TimelineItem)e.RemovedItems[0]!;
-                TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime - ((TimelineItem)e.RemovedItems[0]!).DateTime;
+
+                TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime -
+                                ((TimelineItem)e.RemovedItems[0]!).DateTime;
                 MessageBox.Show($"Difference is {diff.Duration().ToString("h'h 'm'm 's's'")}");
             }
         }

@@ -33,8 +33,8 @@
                     <TextBlock Text="TL Width:" VerticalAlignment="Center"/>
                     <local:NumericField x:Name="widthNumeric" Grid.Column="2" Value="1000"/>
 
-                    <local:DateTimeField x:Name="t0TimeField" Grid.Column="4"/>
-                    <CheckBox x:Name="t0ModeCheckBox" HorizontalAlignment="Center" Content="T-0 Mode" Grid.Column="6" VerticalAlignment="Center"/>
+                    <local:DateTimeField x:Name="tZeroTimeField" Grid.Column="4"/>
+                    <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Center" Content="T-0 Mode" Grid.Column="6" VerticalAlignment="Center"/>
                 </Grid>
 
                 <StackPanel Margin="0,10,0,0">

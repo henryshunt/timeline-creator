@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using TimelineCreator.Controls;
 
 namespace TimelineCreator
@@ -8,6 +9,8 @@ namespace TimelineCreator
     {
         private readonly TimeZoneInfo timeZone;
         public TimelineItem Item { get; private set; }
+        public DateTime? TZeroTime { get; set; } = null;
+        public bool IsTZeroMode { get; set; } = false;
 
         private readonly bool isEditing = false;
 
@@ -43,7 +46,21 @@ namespace TimelineCreator
             }
 
             theTimeField.Value = Item.DateTime;
-            theTimeField.Focus();
+
+            if (TZeroTime != null)
+            {
+                tZeroCheckBox.IsEnabled = true;
+
+                if (IsTZeroMode)
+                {
+                    // TZeroCheckBox_CheckedChanged() will take care of the rest
+                    tZeroCheckBox.IsChecked = true;
+                }
+            }
+            else
+            {
+                theTimeField.Focus();
+            }
         }
 
         private void TheTimeField_ValueChanged(object sender, DateTimeValueChangedEventArgs e)
@@ -51,23 +68,68 @@ namespace TimelineCreator
             submitButton.IsEnabled = e.Value != null;
         }
 
-        private void TheTimeField_ValidationError(object sender, EventArgs e)
+        private void TheTZeroField_ValueChanged(object sender, TZeroValueChangedEventArgs e)
+        {
+            submitButton.IsEnabled = e.Value != null;
+        }
+
+        private void Field_ValidationError(object sender, EventArgs e)
         {
             submitButton.IsEnabled = false;
         }
 
         private void NowButton_Click(object sender, RoutedEventArgs e)
         {
-            theTimeField.Value = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(UtcNowNoMillis(), timeZone.Id);
+            DateTime now = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(UtcNowNoMillis(), timeZone.Id);
+
+            if (tZeroCheckBox.IsChecked == false)
+            {
+                theTimeField.Value = now;
+            }
+            else
+            {
+                theTZeroField.Value = now - TZeroTime;
+            }
+        }
+
+        private void TZeroCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (((CheckBox)sender).IsChecked == true)
+            {
+                theTZeroField.Value = theTimeField.Value - TZeroTime;
+
+                theTimeField.Visibility = Visibility.Collapsed;
+                theTZeroField.Visibility = Visibility.Visible;
+                theTZeroField.Focus();
+            }
+            else
+            {
+                theTimeField.Value = TZeroTime + theTZeroField.Value;
+
+                theTZeroField.Visibility = Visibility.Collapsed;
+                theTimeField.Visibility = Visibility.Visible;
+                theTimeField.Focus();
+            }
         }
 
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
-            Item.DateTime = (DateTime)theTimeField.Value!;
+            if (tZeroCheckBox.IsChecked == true)
+            {
+                Item.DateTime = (DateTime)(TZeroTime + theTZeroField.Value)!;
+            }
+            else
+            {
+                Item.DateTime = (DateTime)theTimeField.Value!;
+            }
+
             Item.Text = theTextBox.Text;
             DialogResult = true;
         }
 
+        /// <summary>
+        /// Gets the current UTC time with the milliseconds zeroed out.
+        /// </summary>
         private static DateTime UtcNowNoMillis()
         {
             DateTime now = DateTime.UtcNow;

@@ -8,10 +8,10 @@ using System.Windows.Media;
 
 namespace TimelineCreator.Controls
 {
-    public partial class DateTimeField : UserControl, INotifyPropertyChanged
+    public partial class TZeroTimeField : UserControl, INotifyPropertyChanged
     {
-        private DateTime? value = null;
-        public DateTime? Value
+        private TimeSpan? value = null;
+        public TimeSpan? Value
         {
             get => value;
 
@@ -21,16 +21,16 @@ namespace TimelineCreator.Controls
                 theTextBox.Background = new SolidColorBrush(Colors.White);
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
-                ValueChanged?.Invoke(this, new DateTimeValueChangedEventArgs(value));
+                ValueChanged?.Invoke(this, new TZeroValueChangedEventArgs(value));
             }
         }
 
-        public event EventHandler<DateTimeValueChangedEventArgs>? ValueChanged;
+        public event EventHandler<TZeroValueChangedEventArgs>? ValueChanged;
         public event EventHandler? ValidationError;
         public event PropertyChangedEventHandler? PropertyChanged;
 
 
-        public DateTimeField()
+        public TZeroTimeField()
         {
             DataContext = this;
             InitializeComponent();
@@ -83,13 +83,20 @@ namespace TimelineCreator.Controls
     }
 
 
-    internal class DateTimeValueConverter : IValueConverter
+    internal class TZeroValueConverter : IValueConverter
     {
         public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value != null)
             {
-                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                if ((TimeSpan)value <= TimeSpan.Zero)
+                {
+                    return ((TimeSpan)value).ToString("'T-'hh':'mm':'ss");
+                }
+                else
+                {
+                    return ((TimeSpan)value).ToString("'T+'hh':'mm':'ss");
+                }
             }
             else
             {
@@ -101,7 +108,18 @@ namespace TimelineCreator.Controls
         {
             if (value != null && (string)value != string.Empty)
             {
-                return DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
+                if (TimeSpan.TryParseExact((string)value, "'T-'hh':'mm':'ss", null, out TimeSpan tMinusTime))
+                {
+                    return tMinusTime.Negate();
+                }
+                else if (TimeSpan.TryParseExact((string)value, "'T+'hh':'mm':'ss", null, out TimeSpan tPlusTime))
+                {
+                    return tPlusTime;
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
@@ -110,18 +128,18 @@ namespace TimelineCreator.Controls
         }
     }
 
-    internal class DateTimeValidationRule : ValidationRule
+    internal class TZeroValidationRule : ValidationRule
     {
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             if (value != null && (string)value != string.Empty)
             {
-                try
+                if (TimeSpan.TryParseExact((string)value, "'T-'hh':'mm':'ss", null, out _) ||
+                    TimeSpan.TryParseExact((string)value, "'T+'hh':'mm':'ss", null, out _))
                 {
-                    DateTime.ParseExact((string)value, "yyyy-MM-dd HH:mm:ss", null);
                     return new ValidationResult(true, null);
                 }
-                catch (FormatException)
+                else
                 {
                     return new ValidationResult(false, string.Empty);
                 }
@@ -133,11 +151,11 @@ namespace TimelineCreator.Controls
         }
     }
 
-    public class DateTimeValueChangedEventArgs : EventArgs
+    public class TZeroValueChangedEventArgs : EventArgs
     {
-        public DateTime? Value { get; set; }
+        public TimeSpan? Value { get; set; }
 
-        public DateTimeValueChangedEventArgs(DateTime? value)
+        public TZeroValueChangedEventArgs(TimeSpan? value)
         {
             Value = value;
         }

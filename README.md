@@ -7,7 +7,8 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 
 # Miscellaneous Information
 - Single-click an item to select it and double-click an item to edit it.
-- Check "T-0 Mode" with a time entered, and the timeline items will show their time as a countdown/up relative to the entered T-0 time.
+- Check "T-0 Mode" and enter a time, and the timeline items will show their time as a countdown/up relative to the T-0 time.
+- When adding or editing an item with T-0 mode enabled, you can enter the time as a countdown/up to the T-0 time. Use the below checkbox to switch between T-0 -relative time and wall-clock time entry.
 - Select an item, then select another item with the control key held. This will display the time difference between the two items.
 
 # Shortcuts
@@ -21,4 +22,4 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
 - Delete -- Delete selected item
 - Esc -- Deselect selected item
-- Double-click background to open the new item box
+- Double-click background to add new item
