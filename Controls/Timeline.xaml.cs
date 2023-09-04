@@ -153,8 +153,6 @@ namespace TimelineCreator.Controls
 
         private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            // TODO: Deal with multiple items per add/remove event
-
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 TimelineItem item = (TimelineItem)e.NewItems![0]!;
@@ -353,26 +351,53 @@ namespace TimelineCreator.Controls
 
         private void Zoom(int percent, double centerYPos)
         {
-            double totalChangePx = (Math.Abs(percent) / 100d) * theGrid.ActualHeight;
+            // TODO: Issue where zooming out to minimum doesn't go exactly to the minimum (off by a
+            // miniscule time value). Noticeable as it's on the boundary between two tick line intervals
 
-            double percentAbove = (centerYPos / theGrid.ActualHeight) * 100f;
-            double abovePx = (totalChangePx / 100d) * percentAbove;
-            TimeSpan timeAbove = TimeSpan.FromSeconds(abovePx * secondsPerPixel);
-            double belowPx = totalChangePx - abovePx;
-            TimeSpan timeBelow = TimeSpan.FromSeconds(belowPx * secondsPerPixel);
+            // TODO: Zoom is not reversable. Zooming in and back out results in a slight vertical shift
 
-            if (percent > 0)
+            // Only zoom if not at min/max zoom
+            if ((viewEndTime - viewStartTime > TimeSpan.FromMinutes(1) && percent > 0) ||
+                (viewEndTime - viewStartTime < TimeSpan.FromDays(3) && percent < 0))
             {
-                viewStartTime += timeAbove;
-                viewEndTime -= timeBelow;
-            }
-            else
-            {
-                viewStartTime -= timeAbove;
-                viewEndTime += timeBelow;
-            }
+                double percentAbove = centerYPos /
+                    (theGrid.ActualHeight - ((TIME_LINE_THICKNESS + START_END_PADDING) * 2)) * 100;
 
-            Render();
+                double totalChangePx = (Math.Abs(percent) / 100d) *
+                    (theGrid.ActualHeight - ((TIME_LINE_THICKNESS + START_END_PADDING) * 2));
+
+                double abovePx = (totalChangePx / 100) * percentAbove;
+                TimeSpan timeAbove = TimeSpan.FromSeconds(abovePx * secondsPerPixel);
+                double belowPx = totalChangePx - abovePx;
+                TimeSpan timeBelow = TimeSpan.FromSeconds(belowPx * secondsPerPixel);
+
+                if (percent > 0)
+                {
+                    viewStartTime += timeAbove;
+                    viewEndTime -= timeBelow;
+                }
+                else
+                {
+                    viewStartTime -= timeAbove;
+                    viewEndTime += timeBelow;
+                }
+
+                // If zoom has overshot the min/max zoom then back up to that limit
+                if (viewEndTime - viewStartTime < TimeSpan.FromMinutes(1))
+                {
+                    TimeSpan halfDiff = (TimeSpan.FromMinutes(1) - (viewEndTime - viewStartTime)) / 2;
+                    viewStartTime -= halfDiff;
+                    viewEndTime += halfDiff;
+                }
+                else if (viewEndTime - viewStartTime > TimeSpan.FromDays(3))
+                {
+                    TimeSpan halfDiff = (viewEndTime - viewStartTime - TimeSpan.FromDays(3)) / 2;
+                    viewStartTime += halfDiff;
+                    viewEndTime -= halfDiff;
+                }
+
+                Render();
+            }
         }
 
         /// <summary>
@@ -469,7 +494,6 @@ namespace TimelineCreator.Controls
         }
         #endregion
 
-        #region Helpers
         /// <summary>
         /// Determines the appropriate time between tick lines based on the total time covered by the view.
         /// </summary>
@@ -501,6 +525,5 @@ namespace TimelineCreator.Controls
         {
             return new DateTime((time.Ticks + nearest.Ticks - 1) / nearest.Ticks * nearest.Ticks, time.Kind);
         }
-        #endregion
     }
 }
