@@ -254,6 +254,9 @@ namespace TimelineCreator.Controls
 
         private void RenderTickLines()
         {
+            // TODO: Tick lines don't take available vertical space into account. Reduced height
+            // should mean a reduced number of tick lines
+
             TimeSpan tickSpacing = CalcTickSpacing(viewEndTime - viewStartTime);
             DateTime firstLineTime = RoundTimeUp(viewStartTime, tickSpacing);
 
@@ -336,8 +339,25 @@ namespace TimelineCreator.Controls
         /// </summary>
         public void GoToViewRange(DateTime viewStart, DateTime viewEnd)
         {
-            viewStartTime = viewStart;
-            viewEndTime = viewEnd;
+            // If zoom is over the min/max zoom then go to center of range at the limit
+            if (viewEnd - viewStart < TimeSpan.FromMinutes(1))
+            {
+                DateTime rangeCentre = viewStart + ((viewEnd - viewStart) / 2);
+                viewStartTime = rangeCentre - TimeSpan.FromSeconds(30);
+                viewEndTime = rangeCentre + TimeSpan.FromSeconds(30);
+            }
+            else if (viewEnd - viewStart > TimeSpan.FromDays(3))
+            {
+                DateTime rangeCentre = viewStart + ((viewEnd - viewStart) / 2);
+                viewStartTime = rangeCentre - TimeSpan.FromDays(1.5);
+                viewEndTime = rangeCentre + TimeSpan.FromDays(1.5);
+            }
+            else
+            {
+                viewStartTime = viewStart;
+                viewEndTime = viewEnd;
+            }
+
             Render();
         }
 
@@ -419,8 +439,7 @@ namespace TimelineCreator.Controls
             }
             else
             {
-                viewStartTime = Items.Min(x => x.DateTime);
-                viewEndTime = Items.Max(x => x.DateTime);
+                GoToViewRange(Items.Min(x => x.DateTime), Items.Max(x => x.DateTime));
             }
 
             Render();

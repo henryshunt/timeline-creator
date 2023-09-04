@@ -234,11 +234,11 @@ namespace TimelineCreator
                 if (itemDialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
                     itemDialog.Item.DateTime > GetSelectedTab().Timeline.GetViewRange().Item2)
                 {
-                    TimeSpan viewRangeHalf = (GetSelectedTab().Timeline.GetViewRange().Item2 -
+                    TimeSpan halfViewRange = (GetSelectedTab().Timeline.GetViewRange().Item2 -
                         GetSelectedTab().Timeline.GetViewRange().Item1) / 2;
 
-                    GetSelectedTab().Timeline.GoToViewRange(itemDialog.Item.DateTime - viewRangeHalf,
-                        itemDialog.Item.DateTime + viewRangeHalf);
+                    GetSelectedTab().Timeline.GoToViewRange(itemDialog.Item.DateTime - halfViewRange,
+                        itemDialog.Item.DateTime + halfViewRange);
                 }
 
                 GetSelectedTab().Timeline.SelectedItem = itemDialog.Item;
