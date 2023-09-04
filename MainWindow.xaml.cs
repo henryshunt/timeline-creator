@@ -218,17 +218,7 @@ namespace TimelineCreator
 
             if (itemDialog.ShowDialog() == true)
             {
-                // Add item at correct position in time-based ordering
-                int i = 0;
-                for (; i < GetSelectedTab().Timeline.Items.Count; i++)
-                {
-                    if (GetSelectedTab().Timeline.Items[i].DateTime > itemDialog.Item.DateTime)
-                    {
-                        break;
-                    }
-                }
-
-                GetSelectedTab().Timeline.Items.Insert(i, itemDialog.Item);
+                GetSelectedTab().Timeline.Items.Add(itemDialog.Item);
 
                 // Centre view range on the new item if it's outside the current view
                 if (itemDialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
