@@ -24,3 +24,4 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Delete -- Delete selected item
 - Esc -- Deselect selected item
 - Double-click background to add new item
+- Ctrl-Tab -- Switch to next tab

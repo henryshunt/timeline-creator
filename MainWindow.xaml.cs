@@ -103,6 +103,14 @@ namespace TimelineCreator
                             GetSelectedTab().Timeline.Items.Last().DateTime);
                     }
                 }
+                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab)
+                {
+                    if (theTabControl.Items.Count > 1)
+                    {
+                        theTabControl.SelectedIndex =
+                            (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
+                    }
+                }
             }
         }
 
