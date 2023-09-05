@@ -37,10 +37,12 @@ namespace TimelineCreator
                 if (hasUnsavedChanges)
                 {
                     Header = Title == string.Empty ? "* Untitled Timeline" : $"* {Title}";
+                    HeaderChanged?.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {
                     Header = Title == string.Empty ? "Untitled Timeline" : Title;
+                    HeaderChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -133,6 +135,11 @@ namespace TimelineCreator
                 Timeline.TZeroTime = TZeroMode ? value : null;
             }
         }
+
+        /// <summary>
+        /// Invoked when the tab's header text changes.
+        /// </summary>
+        public event EventHandler? HeaderChanged;
 
 
         private TimelineTab(bool isFromFile)

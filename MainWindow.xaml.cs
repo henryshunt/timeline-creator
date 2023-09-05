@@ -286,7 +286,6 @@ namespace TimelineCreator
         private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             GetSelectedTab().Title = ((TextBox)sender).Text;
-            Title = $"{GetSelectedTab().Header} - Timeline Creator";
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -308,6 +307,7 @@ namespace TimelineCreator
             if (e.RemovedItems.Count > 0)
             {
                 TimelineTab removedTab = (TimelineTab)e.RemovedItems[0]!;
+                removedTab.HeaderChanged -= SelectedTab_HeaderChanged;
                 widthNumeric.ValueChanged -= WidthNumeric_ValueChanged;
                 tZeroTimeField.ValueChanged -= T0TimeField_ValueChanged;
                 tZeroCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
@@ -341,6 +341,7 @@ namespace TimelineCreator
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
 
+                addedTab.HeaderChanged += SelectedTab_HeaderChanged;
                 widthNumeric.ValueChanged += WidthNumeric_ValueChanged;
                 tZeroTimeField.ValueChanged += T0TimeField_ValueChanged;
                 tZeroCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
@@ -349,6 +350,11 @@ namespace TimelineCreator
                 docDescripTextBox.TextChanged += DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged += TimeZoneComboBox_SelectionChanged;
             }
+        }
+
+        private void SelectedTab_HeaderChanged(object? sender, EventArgs e)
+        {
+            Title = $"{GetSelectedTab().Header} - Timeline Creator";
         }
 
         private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
