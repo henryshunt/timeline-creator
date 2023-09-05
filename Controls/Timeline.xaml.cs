@@ -439,7 +439,7 @@ namespace TimelineCreator.Controls
             }
             else
             {
-                GoToViewRange(Items.Min(x => x.DateTime), Items.Max(x => x.DateTime));
+                GoToViewRange(Items.Min(i => i.DateTime), Items.Max(i => i.DateTime));
             }
 
             Render();

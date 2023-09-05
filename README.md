@@ -10,6 +10,7 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Check "T-0 Mode" and enter a time, and the timeline items will show their time as a countdown/up relative to the T-0 time.
 - When adding or editing an item with T-0 mode enabled, you can enter the time as a countdown/up to the T-0 time. Use the below checkbox to switch between T-0 -relative time and wall-clock time entry.
 - Select an item, then select another item with the control key held. This will display the time difference between the two items.
+- Zooming out is limited to a maximum of three days. This software is designed for precise, short-range timelines rather than long-range timelines.
 
 # Shortcuts
 - Ctrl-N -- Create a new timeline document

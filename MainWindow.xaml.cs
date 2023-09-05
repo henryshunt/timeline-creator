@@ -209,29 +209,29 @@ namespace TimelineCreator
 
         private void AddItemButton_Click(object sender, RoutedEventArgs e)
         {
-            ItemDialog itemDialog = new((TimeZoneInfo)timeZoneComboBox.SelectedItem)
+            ItemDialog dialog = new((TimeZoneInfo)timeZoneComboBox.SelectedItem)
             {
                 TZeroTime = tZeroTimeField.Value,
                 IsTZeroMode = tZeroCheckBox.IsChecked == true,
                 Owner = this
             };
 
-            if (itemDialog.ShowDialog() == true)
+            if (dialog.ShowDialog() == true)
             {
-                GetSelectedTab().Timeline.Items.Add(itemDialog.Item);
+                GetSelectedTab().Timeline.Items.Add(dialog.Item);
 
                 // Centre view range on the new item if it's outside the current view
-                if (itemDialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
-                    itemDialog.Item.DateTime > GetSelectedTab().Timeline.GetViewRange().Item2)
+                if (dialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
+                    dialog.Item.DateTime > GetSelectedTab().Timeline.GetViewRange().Item2)
                 {
                     TimeSpan halfViewRange = (GetSelectedTab().Timeline.GetViewRange().Item2 -
-                        GetSelectedTab().Timeline.GetViewRange().Item1) / 2;
+                                              GetSelectedTab().Timeline.GetViewRange().Item1) / 2;
 
-                    GetSelectedTab().Timeline.GoToViewRange(itemDialog.Item.DateTime - halfViewRange,
-                        itemDialog.Item.DateTime + halfViewRange);
+                    GetSelectedTab().Timeline.GoToViewRange(dialog.Item.DateTime - halfViewRange,
+                                                            dialog.Item.DateTime + halfViewRange);
                 }
 
-                GetSelectedTab().Timeline.SelectedItem = itemDialog.Item;
+                GetSelectedTab().Timeline.SelectedItem = dialog.Item;
             }
         }
 
