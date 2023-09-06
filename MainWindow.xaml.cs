@@ -111,6 +111,11 @@ namespace TimelineCreator
                             (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
                     }
                 }
+                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F)
+                {
+                    searchTextBox.Focus();
+                    searchTextBox.SelectAll();
+                }
             }
         }
 
@@ -320,6 +325,7 @@ namespace TimelineCreator
                 tZeroTimeField.ValueChanged -= T0TimeField_ValueChanged;
                 tZeroCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
                 tZeroCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
+                searchTextBox.TextChanged -= SearchTextBox_TextChanged;
                 docTitleTextBox.TextChanged -= DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged -= DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged -= TimeZoneComboBox_SelectionChanged;
@@ -331,6 +337,7 @@ namespace TimelineCreator
                     widthNumeric.Value = 0;
                     tZeroTimeField.Value = null;
                     tZeroCheckBox.IsChecked = false;
+                    searchTextBox.Text = null;
                     docTitleTextBox.Text = null;
                     docDescripTextBox.Text = null;
                     timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
@@ -345,6 +352,7 @@ namespace TimelineCreator
                 widthNumeric.Value = addedTab.TimelineWidth;
                 tZeroTimeField.Value = addedTab.TZeroTime;
                 tZeroCheckBox.IsChecked = addedTab.TZeroMode;
+                searchTextBox.Text = addedTab.SearchPhrase;
                 docTitleTextBox.Text = addedTab.Title;
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
@@ -354,6 +362,7 @@ namespace TimelineCreator
                 tZeroTimeField.ValueChanged += T0TimeField_ValueChanged;
                 tZeroCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
                 tZeroCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
+                searchTextBox.TextChanged += SearchTextBox_TextChanged;
                 docTitleTextBox.TextChanged += DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged += DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged += TimeZoneComboBox_SelectionChanged;
@@ -369,12 +378,13 @@ namespace TimelineCreator
         {
             if (((Timeline)sender).SelectedItem != null)
             {
-                new ItemDialog((TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
+                ItemDialog dialog = new(
+                    (TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
                 {
                     TZeroTime = tZeroTimeField.Value,
                     IsTZeroMode = tZeroCheckBox.IsChecked == true,
                     Owner = this
-                }.ShowDialog();
+                };
             }
             else
             {
@@ -401,5 +411,10 @@ namespace TimelineCreator
             }
         }
         #endregion
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            GetSelectedTab().SearchPhrase = searchTextBox.Text;
+        }
     }
 }

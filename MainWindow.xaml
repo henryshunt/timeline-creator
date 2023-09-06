@@ -37,41 +37,50 @@
                     <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Center" Content="T-0 Mode" Grid.Column="6" VerticalAlignment="Center"/>
                 </Grid>
 
-                <StackPanel Margin="0,10,0,0">
-                    <Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0">
-                        <Expander.Header>
-                            <TextBlock Text="Document Properties" FontWeight="Bold" Margin="0,-1,0,0"/>
-                        </Expander.Header>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <Border Background="White" Padding="0,10,0,0">
-                            <StackPanel VerticalAlignment="Top">
-                                <Grid VerticalAlignment="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="5"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Search:" VerticalAlignment="Center"/>
+                    <TextBox x:Name="searchTextBox" Grid.Column="2" MaxLines="1" Padding="4,0,4,0" TextChanged="SearchTextBox_TextChanged"/>
+                </Grid>
 
-                                    <TextBlock Text="Title:" VerticalAlignment="Center"/>
-                                    <TextBox x:Name="docTitleTextBox" Grid.Column="2" MaxLines="1" Padding="4,0,4,0"/>
-                                </Grid>
+                <Expander Style="{DynamicResource ExpanderStyle}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="SlateGray" IsExpanded="True" BorderThickness="0" Margin="0,10,0,0">
+                    <Expander.Header>
+                        <TextBlock Text="Document Properties" FontWeight="Bold" Margin="0,-1,0,0"/>
+                    </Expander.Header>
 
-                                <TextBox x:Name="docDescripTextBox" Margin="0,5,0,5" Height="200" AcceptsReturn="True" TextWrapping="Wrap"/>
+                    <Border Background="White" Padding="0,10,0,0">
+                        <StackPanel VerticalAlignment="Top">
+                            <Grid VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                <Grid VerticalAlignment="Top">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="5"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <TextBlock Text="Title:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="docTitleTextBox" Grid.Column="2" MaxLines="1" Padding="4,0,4,0"/>
+                            </Grid>
 
-                                    <TextBlock Text="Time Zone:" VerticalAlignment="Center"/>
-                                    <ComboBox x:Name="timeZoneComboBox" Grid.Column="2"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-                    </Expander>
-                </StackPanel>
+                            <TextBox x:Name="docDescripTextBox" Margin="0,5,0,5" Height="200" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+                            <Grid VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Time Zone:" VerticalAlignment="Center"/>
+                                <ComboBox x:Name="timeZoneComboBox" Grid.Column="2"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Expander>
             </StackPanel>
         </Border>
     </Grid>

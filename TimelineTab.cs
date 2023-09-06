@@ -136,6 +136,18 @@ namespace TimelineCreator
             }
         }
 
+        private string searchPhrase = string.Empty;
+        public string SearchPhrase
+        {
+            get => searchPhrase;
+
+            set
+            {
+                searchPhrase = value;
+                Timeline.SearchText(value);
+            }
+        }
+
         /// <summary>
         /// Invoked when the tab's header text changes.
         /// </summary>
@@ -306,6 +318,9 @@ namespace TimelineCreator
                 {
                     item.PropertyChanged += Item_PropertyChanged;
                 }
+
+                // Refresh search to take account of new items
+                Timeline.SearchText(SearchPhrase);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -326,7 +341,11 @@ namespace TimelineCreator
         private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // Invoked whenever item time or text changes
+
             HasUnsavedChanges = true;
+
+            // Refresh search to take account of possibly changed text
+            Timeline.SearchText(SearchPhrase);
         }
     }
 
