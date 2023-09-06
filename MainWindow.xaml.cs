@@ -65,6 +65,10 @@ namespace TimelineCreator
                 {
                     SaveButton_Click(this, new RoutedEventArgs());
                 }
+                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.I)
+                {
+                    AddItemButton_Click(this, new RoutedEventArgs());
+                }
                 else if (e.Key == Key.Escape)
                 {
                     GetSelectedTab().Timeline.SelectedItem = null;

@@ -153,31 +153,42 @@ namespace TimelineCreator.Controls
 
         private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            bool shouldRender = false;
+
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                TimelineItem item = (TimelineItem)e.NewItems![0]!;
-                item.TZeroTime = TZeroTime;
-                item.PropertyChanged += Item_PropertyChanged;
-
-                if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
+                foreach (TimelineItem item in e.NewItems!)
                 {
-                    Render();
+                    item.TZeroTime = TZeroTime;
+                    item.PropertyChanged += Item_PropertyChanged;
+
+                    if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
+                    {
+                        shouldRender = true;
+                    }
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                TimelineItem item = (TimelineItem)e.OldItems![0]!;
-                item.PropertyChanged -= Item_PropertyChanged;
-
-                if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
+                foreach (TimelineItem item in e.OldItems!)
                 {
-                    Render();
-                }
+                    item.PropertyChanged -= Item_PropertyChanged;
 
-                if (SelectedItem == item)
-                {
-                    SelectedItem = null;
+                    if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
+                    {
+                        shouldRender = true;
+                    }
+
+                    if (SelectedItem == item)
+                    {
+                        SelectedItem = null;
+                    }
                 }
+            }
+
+            if (shouldRender)
+            {
+                Render();
             }
         }
 
