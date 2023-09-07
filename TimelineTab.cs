@@ -36,12 +36,16 @@ namespace TimelineCreator
                 // Include an asterisk in the tab header if there are unsaved changes
                 if (hasUnsavedChanges)
                 {
-                    Header = Title == string.Empty ? "* Untitled Timeline" : $"* {Title}";
+                    Header = FilePath ==
+                        string.Empty ? "* Untitled Timeline" : $"* {Path.GetFileName(FilePath)}";
+
                     HeaderChanged?.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {
-                    Header = Title == string.Empty ? "Untitled Timeline" : Title;
+                    Header = FilePath ==
+                        string.Empty ? "Untitled Timeline" : Path.GetFileName(FilePath);
+
                     HeaderChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -51,23 +55,7 @@ namespace TimelineCreator
         /// Path to the file that is being used to store the document on disk. This can only be changed using
         /// <see cref="SaveDocumentAs(string)"/>.
         /// </summary>
-        public string? FilePath { get; private set; } = null;
-
-        private string title = "Untitled Timeline";
-
-        /// <summary>
-        /// Title of the document.
-        /// </summary>
-        public string Title
-        {
-            get => title;
-
-            set
-            {
-                title = value;
-                HasUnsavedChanges = true;
-            }
-        }
+        public string FilePath { get; private set; } = string.Empty;
 
         private string description = string.Empty;
 
@@ -169,7 +157,7 @@ namespace TimelineCreator
             }
 
             Content = Timeline;
-            Header = Title;
+            Header = "Untitled Timeline";
         }
 
         /// <summary>
@@ -207,12 +195,12 @@ namespace TimelineCreator
 
                 TimelineTab tab = new(true)
                 {
-                    Title = documentJson["title"],
+                    FilePath = filePath,
                     Description = documentJson["description"],
                     TimeZone = timeZone
                 };
 
-                tab.HasUnsavedChanges = false;
+                tab.HasUnsavedChanges = false; // Also sets the tab header
 
                 foreach (dynamic itemJson in documentJson.items)
                 {
@@ -235,8 +223,6 @@ namespace TimelineCreator
 
                 tab.AddCollectionChangedHandler();
                 tab.Timeline.ResetZoom();
-
-                tab.FilePath = filePath;
                 return tab;
             }
             else
@@ -269,6 +255,7 @@ namespace TimelineCreator
         public void SaveDocumentAs(string filePath)
         {
             FilePath = filePath;
+            Header = Path.GetFileName(FilePath);
             SaveDocument();
         }
 
@@ -282,7 +269,6 @@ namespace TimelineCreator
 
             dynamic documentJson = new JObject();
             documentJson.version = 1;
-            documentJson.title = Title;
             documentJson.description = Description;
             documentJson.timeZone = TimeZone.Id;
             documentJson.items = new JArray();

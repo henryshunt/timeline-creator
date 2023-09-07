@@ -152,7 +152,7 @@ namespace TimelineCreator
                     // If a single new, empty document is open then remove it
                     if (theTabControl.Items.Count == 1 &&
                         ((TimelineTab)theTabControl.Items[0]).HasUnsavedChanges == false &&
-                        ((TimelineTab)theTabControl.Items[0]).FilePath == null)
+                        ((TimelineTab)theTabControl.Items[0]).FilePath == string.Empty)
                     {
                         theTabControl.Items.RemoveAt(0);
                     }
@@ -187,23 +187,10 @@ namespace TimelineCreator
         {
             if (GetSelectedTab().FilePath == null)
             {
-                string fileName = docTitleTextBox.Text;
-                if (fileName != string.Empty)
-                {
-                    foreach (char c in Path.GetInvalidFileNameChars())
-                    {
-                        fileName = fileName.Replace(c, '-');
-                    }
-                }
-                else
-                {
-                    fileName = "Untitled Timeline";
-                }
-
                 SaveFileDialog saveDialog = new()
                 {
+                    FileName = "Untitled timeline",
                     Filter = "JSON Files (*.json) | *.json",
-                    FileName = fileName,
                 };
 
                 if (saveDialog.ShowDialog() == true)
@@ -300,11 +287,6 @@ namespace TimelineCreator
             GetSelectedTab().TZeroMode = ((CheckBox)sender).IsChecked == true;
         }
 
-        private void DocTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            GetSelectedTab().Title = ((TextBox)sender).Text;
-        }
-
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             GetSelectedTab().Description = ((TextBox)sender).Text;
@@ -330,7 +312,6 @@ namespace TimelineCreator
                 tZeroCheckBox.Checked -= T0ModeCheckBox_CheckedChanged;
                 tZeroCheckBox.Unchecked -= T0ModeCheckBox_CheckedChanged;
                 searchTextBox.TextChanged -= SearchTextBox_TextChanged;
-                docTitleTextBox.TextChanged -= DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged -= DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged -= TimeZoneComboBox_SelectionChanged;
 
@@ -342,7 +323,6 @@ namespace TimelineCreator
                     tZeroTimeField.Value = null;
                     tZeroCheckBox.IsChecked = false;
                     searchTextBox.Text = null;
-                    docTitleTextBox.Text = null;
                     docDescripTextBox.Text = null;
                     timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
                 }
@@ -357,7 +337,6 @@ namespace TimelineCreator
                 tZeroTimeField.Value = addedTab.TZeroTime;
                 tZeroCheckBox.IsChecked = addedTab.TZeroMode;
                 searchTextBox.Text = addedTab.SearchPhrase;
-                docTitleTextBox.Text = addedTab.Title;
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
 
@@ -367,7 +346,6 @@ namespace TimelineCreator
                 tZeroCheckBox.Checked += T0ModeCheckBox_CheckedChanged;
                 tZeroCheckBox.Unchecked += T0ModeCheckBox_CheckedChanged;
                 searchTextBox.TextChanged += SearchTextBox_TextChanged;
-                docTitleTextBox.TextChanged += DocTitleTextBox_TextChanged;
                 docDescripTextBox.TextChanged += DocDescripTextBox_TextChanged;
                 timeZoneComboBox.SelectionChanged += TimeZoneComboBox_SelectionChanged;
             }
@@ -389,6 +367,8 @@ namespace TimelineCreator
                     IsTZeroMode = tZeroCheckBox.IsChecked == true,
                     Owner = this
                 };
+
+                dialog.ShowDialog();
             }
             else
             {
