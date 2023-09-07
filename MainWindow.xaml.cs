@@ -185,11 +185,11 @@ namespace TimelineCreator
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GetSelectedTab().FilePath == null)
+            if (GetSelectedTab().FilePath == string.Empty)
             {
                 SaveFileDialog saveDialog = new()
                 {
-                    FileName = "Untitled timeline",
+                    FileName = "Untitled Timeline",
                     Filter = "JSON Files (*.json) | *.json",
                 };
 
@@ -284,7 +284,7 @@ namespace TimelineCreator
 
         private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            GetSelectedTab().TZeroMode = ((CheckBox)sender).IsChecked == true;
+            GetSelectedTab().IsTZeroModeEnabled = ((CheckBox)sender).IsChecked == true;
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -335,7 +335,7 @@ namespace TimelineCreator
 
                 widthNumeric.Value = addedTab.TimelineWidth;
                 tZeroTimeField.Value = addedTab.TZeroTime;
-                tZeroCheckBox.IsChecked = addedTab.TZeroMode;
+                tZeroCheckBox.IsChecked = addedTab.IsTZeroModeEnabled;
                 searchTextBox.Text = addedTab.SearchPhrase;
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
@@ -351,9 +351,9 @@ namespace TimelineCreator
             }
         }
 
-        private void SelectedTab_HeaderChanged(object? sender, EventArgs e)
+        private void SelectedTab_HeaderChanged(object? sender, HeaderChangedEventArgs e)
         {
-            Title = $"{GetSelectedTab().Header} - Timeline Creator";
+            Title = $"{e.Header} - Timeline Creator";
         }
 
         private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)

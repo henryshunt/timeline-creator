@@ -49,7 +49,7 @@ namespace TimelineCreator.Controls
             set
             {
                 isSelected = value;
-                markerEllipse.Fill = value ? HOVER_COLOUR : ELLIPSE_COLOUR;
+                markerEllipse.Fill = isSelected ? HOVER_COLOUR : ELLIPSE_COLOUR;
             }
         }
 

@@ -20,10 +20,15 @@ namespace TimelineCreator
     /// </summary>
     public class TimelineTab : TabItem
     {
+        /// <summary>
+        /// Gets the tab's header text.
+        /// </summary>
+        public new string Header => ((TextBlock)base.Header).Text;
+
         private bool hasUnsavedChanges = false;
 
         /// <summary>
-        /// Gets whether any changes have been made to the document since it was last saved.
+        /// Gets whether any changes have been made to the document since it was created or last saved.
         /// </summary>
         public bool HasUnsavedChanges
         {
@@ -32,22 +37,7 @@ namespace TimelineCreator
             private set
             {
                 hasUnsavedChanges = value;
-
-                // Include an asterisk in the tab header if there are unsaved changes
-                if (hasUnsavedChanges)
-                {
-                    Header = FilePath ==
-                        string.Empty ? "* Untitled Timeline" : $"* {Path.GetFileName(FilePath)}";
-
-                    HeaderChanged?.Invoke(this, EventArgs.Empty);
-                }
-                else
-                {
-                    Header = FilePath ==
-                        string.Empty ? "Untitled Timeline" : Path.GetFileName(FilePath);
-
-                    HeaderChanged?.Invoke(this, EventArgs.Empty);
-                }
+                UpdateTabHeader();
             }
         }
 
@@ -94,25 +84,36 @@ namespace TimelineCreator
         /// </summary>
         public readonly Timeline Timeline;
 
+        /// <summary>
+        /// Gets or sets the maximum width of the timeline itself within the tab.
+        /// </summary>
         public int TimelineWidth
         {
             get => Timeline.MaxTimelineWidth;
             set => Timeline.MaxTimelineWidth = value;
         }
 
-        private bool tZeroMode = false;
-        public bool TZeroMode
+        private bool isTZeroModeEnabled = false;
+
+        /// <summary>
+        /// Gets or sets whether the timeline should show times relative to <see cref="TZeroTime"/> if it it set.
+        /// </summary>
+        public bool IsTZeroModeEnabled
         {
-            get => tZeroMode;
+            get => isTZeroModeEnabled;
 
             set
             {
-                tZeroMode = value;
-                Timeline.TZeroTime = value ? TZeroTime : null;
+                isTZeroModeEnabled = value;
+                Timeline.TZeroTime = isTZeroModeEnabled ? TZeroTime : null;
             }
         }
 
         private DateTime? tZeroTime = null;
+
+        /// <summary>
+        /// Gets or sets the T-0 time to use when <see cref="IsTZeroModeEnabled"/> is set to <see cref="true"/>.
+        /// </summary>
         public DateTime? TZeroTime
         {
             get => tZeroTime;
@@ -120,11 +121,15 @@ namespace TimelineCreator
             set
             {
                 tZeroTime = value;
-                Timeline.TZeroTime = TZeroMode ? value : null;
+                Timeline.TZeroTime = IsTZeroModeEnabled ? tZeroTime : null;
             }
         }
 
         private string searchPhrase = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the phrase that is being searched for in the timeline. When set, a search is performed.
+        /// </summary>
         public string SearchPhrase
         {
             get => searchPhrase;
@@ -132,14 +137,14 @@ namespace TimelineCreator
             set
             {
                 searchPhrase = value;
-                Timeline.SearchText(value);
+                Timeline.SearchText(searchPhrase);
             }
         }
 
         /// <summary>
         /// Invoked when the tab's header text changes.
         /// </summary>
-        public event EventHandler? HeaderChanged;
+        public event EventHandler<HeaderChangedEventArgs>? HeaderChanged;
 
 
         private TimelineTab(bool isFromFile)
@@ -157,7 +162,7 @@ namespace TimelineCreator
             }
 
             Content = Timeline;
-            Header = "Untitled Timeline";
+            UpdateTabHeader();
         }
 
         /// <summary>
@@ -231,22 +236,32 @@ namespace TimelineCreator
             }
         }
 
+        /// <summary>
+        /// Determines whether the JSON contents of a timeline file are valid.
+        /// </summary>
         private static async Task<bool> ValidateJson(string json)
         {
-            string schemaJson;
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
-                "TimelineCreator.FileSchema.json")!)
+            try
             {
-                using (StreamReader reader = new(stream))
+                string schemaJson;
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
+                    "TimelineCreator.FileSchema.json")!)
                 {
-                    schemaJson = reader.ReadToEnd();
+                    using (StreamReader reader = new(stream))
+                    {
+                        schemaJson = reader.ReadToEnd();
+                    }
                 }
+
+                JsonSchema schema = await JsonSchema.FromJsonAsync(schemaJson);
+                ICollection<NJsonSchema.Validation.ValidationError> jsonErrors = schema.Validate(json);
+
+                return jsonErrors.Count == 0;
             }
-
-            JsonSchema schema = await JsonSchema.FromJsonAsync(schemaJson);
-            ICollection<NJsonSchema.Validation.ValidationError> jsonErrors = schema.Validate(json);
-
-            return jsonErrors.Count == 0;
+            catch (JsonReaderException)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -255,16 +270,16 @@ namespace TimelineCreator
         public void SaveDocumentAs(string filePath)
         {
             FilePath = filePath;
-            Header = Path.GetFileName(FilePath);
+            UpdateTabHeader();
             SaveDocument();
         }
 
         /// <summary>
-        /// Saves the timeline document to its current file path.
+        /// Saves the timeline document to its currently set file path.
         /// </summary>
         public void SaveDocument()
         {
-            if (FilePath == null)
+            if (FilePath == string.Empty)
                 throw new InvalidOperationException("Document has never been saved.");
 
             dynamic documentJson = new JObject();
@@ -291,11 +306,18 @@ namespace TimelineCreator
             HasUnsavedChanges = false;
         }
 
+        /// <summary>
+        /// Adds the handler to the CollectionChanged event of the tab's timeline items list. Necessary as part of the
+        /// static <see cref="OpenDocument(string)"/> method.
+        /// </summary>
         private void AddCollectionChangedHandler()
         {
             Timeline.Items.CollectionChanged += Items_CollectionChanged;
         }
 
+        /// <summary>
+        /// Invoked whenever the tab's timeline item list changes.
+        /// </summary>
         private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -319,24 +341,64 @@ namespace TimelineCreator
             HasUnsavedChanges = true;
         }
 
+        /// <summary>
+        /// Adds the the handler to the PropertyChanged event of a timeline item. Necessary as part of the static
+        /// <see cref="OpenDocument(string)"/> method.
+        /// </summary>
         private void AddPropertyChangedHandler(TimelineItem item)
         {
             item.PropertyChanged += Item_PropertyChanged;
         }
 
+        /// <summary>
+        /// Invoked whenever the DateTime or Text properties of a timeline item change.
+        /// </summary>
         private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // Invoked whenever item time or text changes
-
             HasUnsavedChanges = true;
 
             // Refresh search to take account of possibly changed text
             Timeline.SearchText(SearchPhrase);
         }
+
+        /// <summary>
+        /// Sets the tab's header text based on the file path and whether there are any unsaved changes.
+        /// </summary>
+        private void UpdateTabHeader()
+        {
+            string header = hasUnsavedChanges ? "* " : "";
+
+            if (FilePath != string.Empty)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(FilePath);
+                header += fileName != string.Empty ? fileName : "Untitled Timeline";
+            }
+            else
+            {
+                header += "Untitled Timeline";
+            }
+
+            TextBlock headerTextBlock = new() { Text = header };
+
+            if (FilePath != string.Empty)
+            {
+                headerTextBlock.ToolTip = FilePath;
+            }
+
+            base.Header = headerTextBlock;
+            HeaderChanged?.Invoke(this, new HeaderChangedEventArgs(header));
+        }
     }
 
-    public class InvalidFileException : Exception
+    public class HeaderChangedEventArgs : Exception
     {
+        public string Header { get; private set; }
 
+        public HeaderChangedEventArgs(string header)
+        {
+            Header = header;
+        }
     }
+
+    public class InvalidFileException : Exception { }
 }

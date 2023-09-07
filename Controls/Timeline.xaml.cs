@@ -40,7 +40,7 @@ namespace TimelineCreator.Controls
 
                 if (IsLoaded)
                 {
-                    theGrid.MaxWidth = value;
+                    theGrid.MaxWidth = maxTimelineWidth;
                     Render();
                 }
             }
