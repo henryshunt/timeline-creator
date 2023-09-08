@@ -161,6 +161,7 @@ namespace TimelineCreator.Controls
                 {
                     item.TZeroTime = TZeroTime;
                     item.PropertyChanged += Item_PropertyChanged;
+                    item.MouseDown += TimelineItem_MouseDown;
 
                     if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
                     {
@@ -173,6 +174,7 @@ namespace TimelineCreator.Controls
                 foreach (TimelineItem item in e.OldItems!)
                 {
                     item.PropertyChanged -= Item_PropertyChanged;
+                    item.MouseDown -= TimelineItem_MouseDown;
 
                     if (item.DateTime >= viewStartTime && item.DateTime <= viewEndTime)
                     {
@@ -338,9 +340,6 @@ namespace TimelineCreator.Controls
             item.Margin = new Thickness(LEFT_PADDING - item.GetMarkerCenterPos().X,
                 yPosition - item.GetMarkerCenterPos().Y, 0, 0);
             item.HorizontalAlignment = HorizontalAlignment.Left;
-
-            // TODO: Does this need to be removed at the start of a render?
-            item.MouseDown += TimelineItem_MouseDown;
         }
         #endregion
 
