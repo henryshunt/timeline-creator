@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:TimelineCreator.Controls">
 
     <Grid>
-        <TextBox x:Name="theTextBox" TextAlignment="Center" MaxLength="10" MaxLines="1" LostFocus="TheTextBox_LostFocus" Validation.Error="TheTextBox_Error" Validation.ErrorTemplate="{x:Null}" Padding="4,0,4,0">
+        <TextBox x:Name="theTextBox" TextAlignment="Center" MaxLength="10" MaxLines="1" LostFocus="TheTextBox_LostFocus" Validation.Error="TheTextBox_Error" Validation.ErrorTemplate="{x:Null}">
             <TextBox.Text>
                 <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                     <Binding.Converter>

@@ -6,7 +6,7 @@
              Loaded="UserControl_Loaded">
 
     <Grid>
-        <TextBox x:Name="theTextBox" TextAlignment="Center" MaxLength="10" MaxLines="1" LostFocus="TheTextBox_LostFocus" Validation.Error="TheTextBox_Error" Validation.ErrorTemplate="{x:Null}" TextChanged="TheTextBox_TextChanged" Padding="4,0,4,0">
+        <TextBox x:Name="theTextBox" TextAlignment="Center" MaxLength="10" MaxLines="1" LostFocus="TheTextBox_LostFocus" Validation.Error="TheTextBox_Error" Validation.ErrorTemplate="{x:Null}" TextChanged="TheTextBox_TextChanged">
             <TextBox.Text>
                 <Binding Path="Value" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                     <Binding.Converter>

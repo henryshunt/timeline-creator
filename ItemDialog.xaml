@@ -30,7 +30,7 @@
                 <Button Content="Now" HorizontalAlignment="Right" Click="NowButton_Click" Grid.Column="2"/>
             </Grid>
 
-            <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="Auto" Grid.Row="2" MaxLines="1"/>
+            <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="Auto" Grid.Row="2" MaxLines="1" Padding="4,3,4,0"/>
         </Grid>
 
         <Border Background="LightGray" Grid.Row="1">
