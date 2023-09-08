@@ -18,7 +18,7 @@ namespace TimelineCreator
     /// <summary>
     /// Represents a timeline document in the form of a <see cref="TabControl"/> tab.
     /// </summary>
-    public class TimelineTab : TabItem
+    public class TimelineTab : TabItem, IDisposable
     {
         /// <summary>
         /// Gets the tab's header text.
@@ -46,6 +46,8 @@ namespace TimelineCreator
         /// <see cref="SaveDocumentAs(string)"/>.
         /// </summary>
         public string FilePath { get; private set; } = string.Empty;
+
+        private FileStream? fileStream = null;
 
         private string description = string.Empty;
 
@@ -178,7 +180,11 @@ namespace TimelineCreator
         /// </summary>
         public async static Task<TimelineTab> OpenDocument(string filePath)
         {
-            string json = File.ReadAllText(filePath);
+            // Locks the file until the tab is disposed
+            FileStream stream = new(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            using StreamReader reader = new(stream, leaveOpen: true);
+
+            string json = reader.ReadToEnd();
 
             if (await ValidateJson(json))
             {
@@ -186,21 +192,18 @@ namespace TimelineCreator
                     new JsonSerializerSettings() { DateParseHandling = DateParseHandling.None })!;
 
                 if (documentJson.version != 1)
-                {
                     throw new InvalidFileException();
-                }
 
                 TimeZoneInfo? timeZone = TimeZoneInfo.GetSystemTimeZones()
                     .FirstOrDefault(tzi => tzi.Id == (string)documentJson.timeZone);
 
                 if (timeZone == null)
-                {
                     throw new InvalidFileException();
-                }
 
                 TimelineTab tab = new(true)
                 {
                     FilePath = filePath,
+                    fileStream = stream,
                     Description = documentJson["description"],
                     TimeZone = timeZone
                 };
@@ -247,10 +250,8 @@ namespace TimelineCreator
                 using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(
                     "TimelineCreator.FileSchema.json")!)
                 {
-                    using (StreamReader reader = new(stream))
-                    {
-                        schemaJson = reader.ReadToEnd();
-                    }
+                    using StreamReader reader = new(stream);
+                    schemaJson = reader.ReadToEnd();
                 }
 
                 JsonSchema schema = await JsonSchema.FromJsonAsync(schemaJson);
@@ -265,10 +266,14 @@ namespace TimelineCreator
         }
 
         /// <summary>
-        /// Saves the timeline document to a specific/new location.
+        /// Saves the timeline document to a specific/new location. Must be called on a new document before
+        /// <see cref="SaveDocument()"/>.
         /// </summary>
         public void SaveDocumentAs(string filePath)
         {
+            fileStream?.Dispose();
+            fileStream = null;
+
             FilePath = filePath;
             UpdateTabHeader();
             SaveDocument();
@@ -302,7 +307,33 @@ namespace TimelineCreator
                 DateFormatString = "yyyy-MM-dd'T'HH:mm:ss"
             };
 
-            File.WriteAllText(FilePath, JsonConvert.SerializeObject(documentJson, settings));
+            bool fileCreated = false;
+            if (fileStream == null)
+            {
+                // Locks the file until the tab is disposed
+                fileStream = new(FilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+                fileCreated = true;
+            }
+
+            try
+            {
+                using StreamWriter writer = new(fileStream, leaveOpen: true);
+                fileStream.Seek(0, SeekOrigin.Begin);
+                writer.Write(JsonConvert.SerializeObject(documentJson, settings));
+            }
+            catch
+            {
+                // Delete the empty file if it's just been created but failed to be written to
+                if (fileCreated)
+                {
+                    File.Delete(FilePath);
+                    fileStream.Dispose();
+                    fileStream = null;
+                }
+
+                throw;
+            }
+
             HasUnsavedChanges = false;
         }
 
@@ -387,6 +418,14 @@ namespace TimelineCreator
 
             base.Header = headerTextBlock;
             HeaderChanged?.Invoke(this, new HeaderChangedEventArgs(header));
+        }
+
+        public void Dispose()
+        {
+            fileStream?.Dispose();
+            fileStream = null;
+
+            GC.SuppressFinalize(this);
         }
     }
 

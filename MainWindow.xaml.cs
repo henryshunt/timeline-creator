@@ -256,6 +256,7 @@ namespace TimelineCreator
             }
 
             int tabIndex = theTabControl.Items.IndexOf(GetSelectedTab());
+            GetSelectedTab().Dispose();
             theTabControl.Items.Remove(GetSelectedTab());
 
             if (theTabControl.Items.Count == 0)
