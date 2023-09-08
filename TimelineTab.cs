@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TimelineCreator.Controls;
 using JsonSchema = NJsonSchema.JsonSchema;
 
@@ -20,6 +21,11 @@ namespace TimelineCreator
     /// </summary>
     public class TimelineTab : TabItem, IDisposable
     {
+        /// <summary>
+        /// Gets or sets the window that owns the tab. Used to associate opened dialogs with the window.
+        /// </summary>
+        private readonly Window owner;
+
         /// <summary>
         /// Gets the tab's header text.
         /// </summary>
@@ -149,14 +155,19 @@ namespace TimelineCreator
         public event EventHandler<HeaderChangedEventArgs>? HeaderChanged;
 
 
-        private TimelineTab(bool isFromFile)
+        private TimelineTab(bool isFromFile, Window owner)
         {
+            this.owner = owner;
+
             Timeline = new Timeline()
             {
                 Margin = new Thickness(10),
                 FontSize = 14,
                 MaxTimelineWidth = 800
             };
+
+            Timeline.SelectionChanged += Timeline_SelectionChanged;
+            Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
 
             if (!isFromFile)
             {
@@ -170,15 +181,15 @@ namespace TimelineCreator
         /// <summary>
         /// Creates a tab containing a new, empty document.
         /// </summary>
-        public static TimelineTab NewDocument()
+        public static TimelineTab NewDocument(Window owner)
         {
-            return new TimelineTab(false);
+            return new TimelineTab(false, owner);
         }
 
         /// <summary>
         /// Creates a tab containing the contents of an existing timeline document.
         /// </summary>
-        public async static Task<TimelineTab> OpenDocument(string filePath)
+        public async static Task<TimelineTab> OpenDocument(string filePath, Window owner)
         {
             // Locks the file until the tab is disposed
             FileStream stream = new(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
@@ -200,7 +211,7 @@ namespace TimelineCreator
                 if (timeZone == null)
                     throw new InvalidFileException();
 
-                TimelineTab tab = new(true)
+                TimelineTab tab = new(true, owner)
                 {
                     FilePath = filePath,
                     fileStream = stream,
@@ -318,7 +329,7 @@ namespace TimelineCreator
             try
             {
                 using StreamWriter writer = new(fileStream, leaveOpen: true);
-                fileStream.Seek(0, SeekOrigin.Begin);
+                fileStream.SetLength(0); // We're going to rewrite the whole file, so empty it
                 writer.Write(JsonConvert.SerializeObject(documentJson, settings));
             }
             catch
@@ -358,6 +369,18 @@ namespace TimelineCreator
                     item.PropertyChanged += Item_PropertyChanged;
                 }
 
+                TimelineItem newItem = (TimelineItem)e.NewItems[0]!;
+
+                // Centre view range on the new item if it's outside the current view
+                if (newItem.DateTime < Timeline.GetViewRange().Item1 ||
+                    newItem.DateTime > Timeline.GetViewRange().Item2)
+                {
+                    TimeSpan halfViewRange = (Timeline.GetViewRange().Item2 - Timeline.GetViewRange().Item1) / 2;
+                    Timeline.GoToViewRange(newItem.DateTime - halfViewRange, newItem.DateTime + halfViewRange);
+                }
+
+                Timeline.SelectedItem = newItem;
+
                 // Refresh search to take account of new items
                 Timeline.SearchText(SearchPhrase);
             }
@@ -390,6 +413,49 @@ namespace TimelineCreator
 
             // Refresh search to take account of possibly changed text
             Timeline.SearchText(SearchPhrase);
+        }
+
+        private void Timeline_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+        {
+            // Calculate time difference if control-clicking on two items
+            if (e.AddedItems.Count == 1 && e.RemovedItems.Count == 1 && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                // If we don't do this, a stack overflow will happen because the line after this
+                // will invoke SelectionChanged again, and the condition above will match again, which
+                // will invoke it again, and so on.
+                ((Timeline)sender!).SelectedItem = null;
+
+                ((Timeline)sender!).SelectedItem = (TimelineItem)e.RemovedItems[0]!;
+                TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime - ((TimelineItem)e.RemovedItems[0]!).DateTime;
+                MessageBox.Show($"Difference is {diff.Duration().ToString("h'h 'm'm 's's'")}");
+            }
+        }
+
+        private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (((Timeline)sender).SelectedItem != null)
+            {
+                new ItemDialog(TimeZone, ((Timeline)sender).SelectedItem!)
+                {
+                    TZeroTime = TZeroTime,
+                    IsTZeroMode = IsTZeroModeEnabled,
+                    Owner = owner
+                }.ShowDialog();
+            }
+            else
+            {
+                ItemDialog dialog = new(TimeZone)
+                {
+                    TZeroTime = TZeroTime,
+                    IsTZeroMode = IsTZeroModeEnabled,
+                    Owner = owner
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    Timeline.Items.Add(dialog.Item);
+                }
+            }
         }
 
         /// <summary>

@@ -126,11 +126,7 @@ namespace TimelineCreator
         #region Main Controls
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
-            TimelineTab newTab = TimelineTab.NewDocument();
-            newTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
-            newTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
-
-            theTabControl.Items.Add(newTab);
+            theTabControl.Items.Add(TimelineTab.NewDocument(this));
             theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
         }
 
@@ -145,9 +141,7 @@ namespace TimelineCreator
             {
                 try
                 {
-                    TimelineTab newTab = await TimelineTab.OpenDocument(openDialog.FileName);
-                    newTab.Timeline.PreviewMouseDoubleClick += Timeline_PreviewMouseDoubleClick;
-                    newTab.Timeline.SelectionChanged += Timeline_SelectionChanged;
+                    TimelineTab newTab = await TimelineTab.OpenDocument(openDialog.FileName, this);
 
                     // If a single new, empty document is open then remove it
                     if (theTabControl.Items.Count == 1 &&
@@ -223,19 +217,6 @@ namespace TimelineCreator
             if (dialog.ShowDialog() == true)
             {
                 GetSelectedTab().Timeline.Items.Add(dialog.Item);
-
-                // Centre view range on the new item if it's outside the current view
-                if (dialog.Item.DateTime < GetSelectedTab().Timeline.GetViewRange().Item1 ||
-                    dialog.Item.DateTime > GetSelectedTab().Timeline.GetViewRange().Item2)
-                {
-                    TimeSpan halfViewRange = (GetSelectedTab().Timeline.GetViewRange().Item2 -
-                                              GetSelectedTab().Timeline.GetViewRange().Item1) / 2;
-
-                    GetSelectedTab().Timeline.GoToViewRange(dialog.Item.DateTime - halfViewRange,
-                                                            dialog.Item.DateTime + halfViewRange);
-                }
-
-                GetSelectedTab().Timeline.SelectedItem = dialog.Item;
             }
         }
 
@@ -286,6 +267,11 @@ namespace TimelineCreator
         private void T0ModeCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
         {
             GetSelectedTab().IsTZeroModeEnabled = ((CheckBox)sender).IsChecked == true;
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            GetSelectedTab().SearchPhrase = searchTextBox.Text;
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -356,50 +342,6 @@ namespace TimelineCreator
         {
             Title = $"{e.Header} - Timeline Creator";
         }
-
-        private void Timeline_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (((Timeline)sender).SelectedItem != null)
-            {
-                ItemDialog dialog = new(
-                    (TimeZoneInfo)timeZoneComboBox.SelectedItem, ((Timeline)sender).SelectedItem!)
-                {
-                    TZeroTime = tZeroTimeField.Value,
-                    IsTZeroMode = tZeroCheckBox.IsChecked == true,
-                    Owner = this
-                };
-
-                dialog.ShowDialog();
-            }
-            else
-            {
-                AddItemButton_Click(this, new RoutedEventArgs());
-            }
-        }
-
-        private void Timeline_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-        {
-            // Calculate time difference if control-clicking on two items
-            if (e.AddedItems.Count == 1 && e.RemovedItems.Count == 1 &&
-                Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                // If we don't do this, a stack overflow will happen because the line after this
-                // will invoke SelectionChanged again, and the condition above will match again, which
-                // will invoke it again, and so on.
-                ((Timeline)sender!).SelectedItem = null;
-
-                ((Timeline)sender!).SelectedItem = (TimelineItem)e.RemovedItems[0]!;
-
-                TimeSpan diff = ((TimelineItem)e.AddedItems[0]!).DateTime -
-                                ((TimelineItem)e.RemovedItems[0]!).DateTime;
-                MessageBox.Show($"Difference is {diff.Duration().ToString("h'h 'm'm 's's'")}");
-            }
-        }
         #endregion
-
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            GetSelectedTab().SearchPhrase = searchTextBox.Text;
-        }
     }
 }
