@@ -455,11 +455,11 @@ namespace TimelineCreator.Controls
             Render();
         }
 
-        private void TimelineItem_MouseDown(object sender, MouseButtonEventArgs e)
+        private void UserControl_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && mouseDownItem == null)
+            if (e.ChangedButton == MouseButton.Left)
             {
-                mouseDownItem = (TimelineItem)sender;
+                Focus();
             }
         }
 
@@ -519,6 +519,14 @@ namespace TimelineCreator.Controls
             else if (e.ChangedButton == MouseButton.Middle)
             {
                 ResetZoom();
+            }
+        }
+
+        private void TimelineItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && mouseDownItem == null)
+            {
+                mouseDownItem = (TimelineItem)sender;
             }
         }
         #endregion
