@@ -524,18 +524,6 @@ namespace TimelineCreator.Controls
         #endregion
 
         /// <summary>
-        /// Highlights all occurrences of a search phrase within the timeline's items. <see cref="string.Empty"/> to
-        /// clear search.
-        /// </summary>
-        public void SearchText(string phrase)
-        {
-            foreach (TimelineItem item in Items)
-            {
-                item.SearchText(phrase);
-            }
-        }
-
-        /// <summary>
         /// Determines the appropriate time between tick lines based on the total time covered by the view.
         /// </summary>
         private static TimeSpan CalcTickSpacing(TimeSpan timeSpan)

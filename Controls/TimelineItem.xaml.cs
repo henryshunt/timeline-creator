@@ -103,7 +103,7 @@ namespace TimelineCreator.Controls
         /// Highlights all occurrences of a search phrase within the item's text. <see cref="string.Empty"/> to clear
         /// search.
         /// </summary>
-        public void SearchText(string phrase)
+        public int SearchText(string phrase)
         {
             if (Text.Length > 0 && phrase.Length > 0)
             {
@@ -134,6 +134,8 @@ namespace TimelineCreator.Controls
                     {
                         textTextBlock.Inlines.Add(new Run(Text[index..]));
                     }
+
+                    return matches.Count;
                 }
                 else
                 {
@@ -146,6 +148,8 @@ namespace TimelineCreator.Controls
                 textTextBlock.Inlines.Clear();
                 textTextBlock.Text = Text;
             }
+
+            return 0;
         }
 
         /// <summary>

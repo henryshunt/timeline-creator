@@ -272,6 +272,7 @@ namespace TimelineCreator
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             GetSelectedTab().SearchPhrase = searchTextBox.Text;
+            searchResCountText.Text = GetSelectedTab().SearchResultCount.ToString();
         }
 
         private void DocDescripTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -310,6 +311,7 @@ namespace TimelineCreator
                     tZeroTimeField.Value = null;
                     tZeroCheckBox.IsChecked = false;
                     searchTextBox.Text = null;
+                    searchResCountText.Text = "0";
                     docDescripTextBox.Text = null;
                     timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
                 }
@@ -324,6 +326,7 @@ namespace TimelineCreator
                 tZeroTimeField.Value = addedTab.TZeroTime;
                 tZeroCheckBox.IsChecked = addedTab.IsTZeroModeEnabled;
                 searchTextBox.Text = addedTab.SearchPhrase;
+                searchResCountText.Text = addedTab.SearchResultCount.ToString();
                 docDescripTextBox.Text = addedTab.Description;
                 timeZoneComboBox.SelectedItem = addedTab.TimeZone;
 

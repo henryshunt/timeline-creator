@@ -145,9 +145,14 @@ namespace TimelineCreator
             set
             {
                 searchPhrase = value;
-                Timeline.SearchText(searchPhrase);
+                SearchTimeline(searchPhrase);
             }
         }
+
+        /// <summary>
+        /// Gets the number of search results for the set search phrase.
+        /// </summary>
+        public int SearchResultCount { get; private set; } = 0;
 
         /// <summary>
         /// Invoked when the tab's header text changes.
@@ -382,7 +387,7 @@ namespace TimelineCreator
                 Timeline.SelectedItem = newItem;
 
                 // Refresh search to take account of new items
-                Timeline.SearchText(SearchPhrase);
+                SearchTimeline(SearchPhrase);
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -411,8 +416,8 @@ namespace TimelineCreator
         {
             HasUnsavedChanges = true;
 
-            // Refresh search to take account of possibly changed text
-            Timeline.SearchText(SearchPhrase);
+            // Refresh search to take account of possibly changed item text
+            SearchTimeline(SearchPhrase);
         }
 
         private void Timeline_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -456,6 +461,22 @@ namespace TimelineCreator
                     Timeline.Items.Add(dialog.Item);
                 }
             }
+        }
+
+        /// <summary>
+        /// Highlights all occurrences of a search phrase within the timeline. <see cref="string.Empty"/> to clear
+        /// search.
+        /// </summary>
+        private void SearchTimeline(string phrase)
+        {
+            int resultCount = 0;
+
+            foreach (TimelineItem item in Timeline.Items)
+            {
+                resultCount += item.SearchText(phrase);
+            }
+
+            SearchResultCount = resultCount;
         }
 
         /// <summary>
