@@ -19,10 +19,112 @@ namespace TimelineCreator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            AddKeyboardShortcuts();
+
             timeZoneComboBox.ItemsSource = TimeZoneInfo.GetSystemTimeZones();
             timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
 
             NewButton_Click(this, new RoutedEventArgs());
+        }
+
+        private void AddKeyboardShortcuts()
+        {
+            // TODO: I'd prefer if these didn't repeat when a key is held down
+
+            RoutedCommand newCommand = new();
+            newCommand.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(newCommand, NewButton_Click));
+            RoutedCommand openCommand = new();
+            openCommand.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(openCommand, OpenButton_Click));
+
+            RoutedCommand tabCommand = new();
+            tabCommand.InputGestures.Add(new KeyGesture(Key.Tab, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(tabCommand, (sender, e) =>
+            {
+                if (theTabControl.Items.Count > 1)
+                {
+                    theTabControl.SelectedIndex =
+                        (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
+                }
+            }));
+
+            RoutedCommand saveCommand = new();
+            saveCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(saveCommand, SaveButton_Click));
+            RoutedCommand addItemCommand = new();
+            addItemCommand.InputGestures.Add(new KeyGesture(Key.I, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(addItemCommand, AddItemButton_Click));
+
+            RoutedCommand escapeCommand = new();
+            escapeCommand.InputGestures.Add(new KeyGesture(Key.Escape));
+            CommandBindings.Add(new CommandBinding(escapeCommand, (sender, e) =>
+            {
+                if (searchTextBox.IsFocused && searchTextBox.Text.Length > 0)
+                {
+                    searchTextBox.Text = string.Empty;
+                }
+                else
+                {
+                    GetSelectedTab().Timeline.SelectedItem = null;
+                }
+            }));
+
+            RoutedCommand deleteCommand = new();
+            deleteCommand.InputGestures.Add(new KeyGesture(Key.Delete));
+            CommandBindings.Add(new CommandBinding(deleteCommand, (sender, e) =>
+            {
+                if (GetSelectedTab().Timeline.SelectedItem != null)
+                {
+                    GetSelectedTab().Timeline.Items.Remove(GetSelectedTab().Timeline.SelectedItem!);
+                }
+            }));
+
+            RoutedCommand zeroCommand = new();
+            zeroCommand.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(zeroCommand, (sender, e) =>
+            {
+                GetSelectedTab().Timeline.ResetZoom();
+            }));
+
+            RoutedCommand homeCommand = new();
+            homeCommand.InputGestures.Add(new KeyGesture(Key.Home, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(homeCommand, (sender, e) =>
+            {
+                if (GetSelectedTab().Timeline.Items.Count > 0)
+                {
+                    // Move view range to start at first item
+                    (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
+                    TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
+
+                    GetSelectedTab().Timeline.GoToViewRange(GetSelectedTab().Timeline.Items[0].DateTime,
+                        GetSelectedTab().Timeline.Items[0].DateTime + viewRange);
+                }
+            }));
+
+            RoutedCommand endCommand = new();
+            endCommand.InputGestures.Add(new KeyGesture(Key.End, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(endCommand, (sender, e) =>
+            {
+                if (GetSelectedTab().Timeline.Items.Count > 0)
+                {
+                    // Move view range to end at last item
+                    (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
+                    TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
+
+                    GetSelectedTab().Timeline.GoToViewRange(
+                        GetSelectedTab().Timeline.Items.Last().DateTime - viewRange,
+                        GetSelectedTab().Timeline.Items.Last().DateTime);
+                }
+            }));
+
+            RoutedCommand searchCommand = new();
+            searchCommand.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(searchCommand, (sender, e) =>
+            {
+                searchTextBox.Focus();
+                searchTextBox.SelectAll();
+            }));
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -45,80 +147,6 @@ namespace TimelineCreator
                     MessageBoxImage.Warning) == MessageBoxResult.No)
                 {
                     e.Cancel = true;
-                }
-            }
-        }
-
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.IsRepeat == false)
-            {
-                if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
-                {
-                    NewButton_Click(this, new RoutedEventArgs());
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.O)
-                {
-                    OpenButton_Click(this, new RoutedEventArgs());
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
-                {
-                    SaveButton_Click(this, new RoutedEventArgs());
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.I)
-                {
-                    AddItemButton_Click(this, new RoutedEventArgs());
-                }
-                else if (e.Key == Key.Escape)
-                {
-                    GetSelectedTab().Timeline.SelectedItem = null;
-                }
-                else if (e.Key == Key.Delete)
-                {
-                    if (GetSelectedTab().Timeline.SelectedItem != null)
-                    {
-                        GetSelectedTab().Timeline.Items.Remove(GetSelectedTab().Timeline.SelectedItem!);
-                    }
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0)
-                {
-                    GetSelectedTab().Timeline.ResetZoom();
-                }
-                else if (e.Key == Key.Home) // Move view range to start at first item
-                {
-                    if (GetSelectedTab().Timeline.Items.Count > 0)
-                    {
-                        (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
-                        TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
-
-                        GetSelectedTab().Timeline.GoToViewRange(GetSelectedTab().Timeline.Items[0].DateTime,
-                            GetSelectedTab().Timeline.Items[0].DateTime + viewRange);
-                    }
-                }
-                else if (e.Key == Key.End) // Move view range to end at last item
-                {
-                    if (GetSelectedTab().Timeline.Items.Count > 0)
-                    {
-                        (DateTime, DateTime) viewRangeBounds = GetSelectedTab().Timeline.GetViewRange();
-                        TimeSpan viewRange = viewRangeBounds.Item2 - viewRangeBounds.Item1;
-
-                        GetSelectedTab().Timeline.GoToViewRange(
-                            GetSelectedTab().Timeline.Items.Last().DateTime - viewRange,
-                            GetSelectedTab().Timeline.Items.Last().DateTime);
-                    }
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Tab)
-                {
-                    if (theTabControl.Items.Count > 1)
-                    {
-                        theTabControl.SelectedIndex =
-                            (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
-                    }
-                }
-                else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F)
-                {
-                    searchTextBox.Focus();
-                    searchTextBox.SelectAll();
                 }
             }
         }
@@ -310,9 +338,9 @@ namespace TimelineCreator
                     widthNumeric.Value = 0;
                     tZeroTimeField.Value = null;
                     tZeroCheckBox.IsChecked = false;
-                    searchTextBox.Text = null;
+                    searchTextBox.Text = string.Empty;
                     searchResCountText.Text = "0";
-                    docDescripTextBox.Text = null;
+                    docDescripTextBox.Text = string.Empty;
                     timeZoneComboBox.SelectedItem = TimeZoneInfo.Local;
                 }
             }

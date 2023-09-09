@@ -7,7 +7,7 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 
 # Miscellaneous Information
 - Click and drag to pan up or down the timeline. Scroll the mouse wheel to zoom in and out.
-- Single-click an item to select it and double-click an item to edit it.
+- Click an item to select it and double-click an item to edit it. Click on the background to deselect the selected item.
 - Check "T-0 Mode" and enter a time, and the timeline items will show their time as a countdown/up relative to the T-0 time.
 - When adding or editing an item with T-0 mode enabled, you can enter the time as a countdown/up to the T-0 time. Use the below checkbox to switch between T-0 -relative time and wall-clock time entry.
 - Select an item, then select another item with the control key held. This will display the time difference between the two items.
@@ -23,6 +23,6 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Mouse Wheel Scroll -- Zoom in/out
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
 - Delete -- Delete selected item
-- Esc -- Deselect selected item
+- Esc -- Deselect selected item or clear search
 - Ctrl-Tab -- Switch to next tab
 - Ctrl-F -- Focus on timeline search box
