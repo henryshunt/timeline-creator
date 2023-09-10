@@ -23,6 +23,6 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Mouse Wheel Scroll -- Zoom in/out
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
 - Delete -- Delete selected item
-- Esc -- Deselect selected item or clear search
+- Esc -- Deselect selected item
 - Ctrl-Tab -- Switch to next tab
 - Ctrl-F -- Focus on timeline search box
