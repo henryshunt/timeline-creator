@@ -165,18 +165,11 @@ namespace TimelineCreator.Controls
             {
                 TimeSpan relToTZero = DateTime - (DateTime)TZeroTime;
 
-                if (relToTZero == TimeSpan.Zero)
-                {
-                    timeTextBlock.Text = relToTZero.ToString("hh\\:mm\\:ss");
-                }
-                else if (relToTZero > TimeSpan.Zero)
-                {
+                if (relToTZero > TimeSpan.Zero)
                     timeTextBlock.Text = "+" + relToTZero.ToString("hh\\:mm\\:ss");
-                }
                 else if (relToTZero < TimeSpan.Zero)
-                {
                     timeTextBlock.Text = "-" + relToTZero.ToString("hh\\:mm\\:ss");
-                }
+                else timeTextBlock.Text = relToTZero.ToString("hh\\:mm\\:ss");
             }
         }
 
