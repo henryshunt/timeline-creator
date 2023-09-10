@@ -14,7 +14,7 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Zooming out is limited to a maximum of three days. This software is designed for precise, short-range timelines rather than long-range timelines.
 
 # Usage
-Open the project in Visual Studio, restore the NuGet packages and run the project.
+Open the project in Visual Studio (requires .NET 7), restore the NuGet packages and run the project.
 
 # Shortcuts
 - Ctrl-N -- Create a new timeline document
