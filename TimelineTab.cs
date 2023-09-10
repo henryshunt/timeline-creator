@@ -309,6 +309,8 @@ namespace TimelineCreator
             documentJson.timeZone = TimeZone.Id;
             documentJson.items = new JArray();
 
+            // TODO: Items should be written to file in ascending time order
+
             foreach (TimelineItem item in Timeline.Items)
             {
                 dynamic itemJson = new JObject();
