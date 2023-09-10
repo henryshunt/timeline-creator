@@ -13,6 +13,9 @@ The application has a tabbed, document-based interface, and a timeline renderer 
 - Select an item, then select another item with the control key held. This will display the time difference between the two items.
 - Zooming out is limited to a maximum of three days. This software is designed for precise, short-range timelines rather than long-range timelines.
 
+# Usage
+Open the project in Visual Studio, restore the NuGet packages and run the project.
+
 # Shortcuts
 - Ctrl-N -- Create a new timeline document
 - Ctrl-O -- Open an existing timeline document
