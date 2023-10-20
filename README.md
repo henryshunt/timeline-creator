@@ -28,4 +28,5 @@ Open the project in Visual Studio (requires .NET 7), restore the NuGet packages 
 - Delete -- Delete selected item
 - Esc -- Deselect selected item
 - Ctrl-Tab -- Switch to next tab
+- Ctrl+Shift-Tab -- Switch to previous tab
 - Ctrl-F -- Focus on timeline search box

@@ -38,14 +38,31 @@ namespace TimelineCreator
             openCommand.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control));
             CommandBindings.Add(new CommandBinding(openCommand, OpenButton_Click));
 
-            RoutedCommand tabCommand = new();
-            tabCommand.InputGestures.Add(new KeyGesture(Key.Tab, ModifierKeys.Control));
-            CommandBindings.Add(new CommandBinding(tabCommand, (sender, e) =>
+            RoutedCommand tabFwdCommand = new();
+            tabFwdCommand.InputGestures.Add(new KeyGesture(Key.Tab, ModifierKeys.Control));
+            CommandBindings.Add(new CommandBinding(tabFwdCommand, (sender, e) =>
             {
                 if (theTabControl.Items.Count > 1)
                 {
-                    theTabControl.SelectedIndex =
-                        (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
+                    theTabControl.SelectedIndex = (theTabControl.SelectedIndex + 1) % theTabControl.Items.Count;
+                }
+            }));
+
+            RoutedCommand tabBckCommand = new();
+            tabBckCommand.InputGestures.Add(new KeyGesture(Key.Tab, ModifierKeys.Control | ModifierKeys.Shift));
+            CommandBindings.Add(new CommandBinding(tabBckCommand, (sender, e) =>
+            {
+                if (theTabControl.Items.Count > 1)
+                {
+                    // Modulo won't work for negative numbers
+                    if (theTabControl.SelectedIndex > 0)
+                    {
+                        theTabControl.SelectedIndex = (theTabControl.SelectedIndex - 1) % theTabControl.Items.Count;
+                    }
+                    else
+                    {
+                        theTabControl.SelectedIndex = theTabControl.Items.Count - 1;
+                    }
                 }
             }));
 
