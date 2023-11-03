@@ -25,7 +25,6 @@ Open the project in Visual Studio (requires .NET 7), restore the NuGet packages 
 - End -- Move timeline view to end at last item
 - Mouse Wheel Scroll -- Zoom in/out
 - Ctrl-0/Mouse Wheel Press -- Zoom to fit entire timeline
-- Delete -- Delete selected item
 - Esc -- Deselect selected item
 - Ctrl-Tab -- Switch to next tab
 - Ctrl+Shift-Tab -- Switch to previous tab

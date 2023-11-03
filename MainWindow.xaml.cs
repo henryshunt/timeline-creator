@@ -87,16 +87,6 @@ namespace TimelineCreator
                 }
             }));
 
-            RoutedCommand deleteCommand = new();
-            deleteCommand.InputGestures.Add(new KeyGesture(Key.Delete));
-            CommandBindings.Add(new CommandBinding(deleteCommand, (sender, e) =>
-            {
-                if (GetSelectedTab().Timeline.SelectedItem != null)
-                {
-                    GetSelectedTab().Timeline.Items.Remove(GetSelectedTab().Timeline.SelectedItem!);
-                }
-            }));
-
             RoutedCommand zeroCommand = new();
             zeroCommand.InputGestures.Add(new KeyGesture(Key.D0, ModifierKeys.Control));
             CommandBindings.Add(new CommandBinding(zeroCommand, (sender, e) =>
