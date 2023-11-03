@@ -46,6 +46,7 @@ namespace TimelineCreator
             }
 
             theTimeField.Value = Item.DateTime;
+            importantCheckBox.IsChecked = Item.IsImportant;
 
             if (TZeroTime != null)
             {
@@ -124,6 +125,7 @@ namespace TimelineCreator
             }
 
             Item.Text = theTextBox.Text;
+            Item.IsImportant = importantCheckBox.IsChecked == true;
             DialogResult = true;
         }
 

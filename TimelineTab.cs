@@ -236,6 +236,11 @@ namespace TimelineCreator
                             Text = itemJson.text
                         };
 
+                        if (itemJson.ContainsKey("isImportant"))
+                        {
+                            item.IsImportant = itemJson["isImportant"];
+                        }
+
                         tab.AddPropertyChangedHandler(item);
                         tab.Timeline.Items.Add(item);
                     }
@@ -316,6 +321,12 @@ namespace TimelineCreator
                 dynamic itemJson = new JObject();
                 itemJson.time = item.DateTime;
                 itemJson.text = item.Text;
+
+                if (item.IsImportant)
+                {
+                    itemJson.isImportant = true;
+                }
+
                 documentJson.items.Add(itemJson);
             }
 

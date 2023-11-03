@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:TimelineCreator.Controls"
         
-        Title="Add Item to Timeline" Height="220" Width="360" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+        Title="Add Item to Timeline" Width="360" Height="Auto" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" SizeToContent="Height" UseLayoutRounding="True">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -11,13 +11,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="5"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
+        <StackPanel Margin="10">
             <Grid VerticalAlignment="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -30,8 +24,9 @@
                 <Button Content="Now" HorizontalAlignment="Right" Click="NowButton_Click" Grid.Column="2"/>
             </Grid>
 
-            <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="Auto" Grid.Row="2" MaxLines="1" Padding="4,3,4,0"/>
-        </Grid>
+            <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="108" MaxLines="1" Padding="4,3,4,0" Margin="0,5,0,0"/>
+            <CheckBox x:Name="importantCheckBox" Content="Mark item as important (shows a red exclamation mark)" Margin="0,5,0,0"/>
+        </StackPanel>
 
         <Border Background="LightGray" Grid.Row="1">
             <Grid Margin="10">
@@ -43,7 +38,7 @@
                 <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Enter time relative to T-0" Checked="TZeroCheckBox_CheckedChanged" Unchecked="TZeroCheckBox_CheckedChanged" IsEnabled="False"/>
                 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="1">
-                    <Button x:Name="submitButton" Content="Add Item" Margin="0,0,5,0" Width="80" Click="SubmitButton_Click" IsDefault="True"/>
+                    <Button x:Name="submitButton" Content="Add Item" Margin="0,0,5,0" Width="80" Click="SubmitButton_Click" IsDefault="True" FontWeight="Bold"/>
                     <Button Content="Cancel" IsCancel="True"/>
                 </StackPanel>
             </Grid>

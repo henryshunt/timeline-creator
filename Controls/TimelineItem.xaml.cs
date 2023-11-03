@@ -41,6 +41,21 @@ namespace TimelineCreator.Controls
             }
         }
 
+        private bool isImportant = false;
+        public bool IsImportant
+        {
+            get => isImportant;
+
+            set
+            {
+                isImportant = value;
+                importantTextBlock.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                textTextBlock.Text = text;
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsImportant)));
+            }
+        }
+
         private bool isSelected = false;
         public bool IsSelected
         {
@@ -95,8 +110,19 @@ namespace TimelineCreator.Controls
         /// </summary>
         public Point GetMarkerCenterPos()
         {
-            return new Point(timeTextBlock.DesiredSize.Width + 10 + (markerEllipse.Width / 2),
-                timeTextBlock.DesiredSize.Height / 2);
+            // TODO: Should be doing this by getting absolute position of marker ellipse relative to
+            // the control but can't get that to work
+
+            double xPosition = timeTextBlock.DesiredSize.Width +
+                               theGrid.ColumnDefinitions[2].Width.Value +
+                               (markerEllipse.Width / 2);
+
+            if (importantTextBlock.Visibility != Visibility.Collapsed)
+            {
+                xPosition += importantTextBlock.DesiredSize.Width;
+            }
+
+            return new Point(xPosition, timeTextBlock.DesiredSize.Height / 2);
         }
 
         /// <summary>
@@ -164,12 +190,18 @@ namespace TimelineCreator.Controls
             else
             {
                 TimeSpan relToTZero = DateTime - (DateTime)TZeroTime;
-
                 if (relToTZero > TimeSpan.Zero)
+                {
                     timeTextBlock.Text = "+" + relToTZero.ToString("hh\\:mm\\:ss");
+                }
                 else if (relToTZero < TimeSpan.Zero)
+                {
                     timeTextBlock.Text = "-" + relToTZero.ToString("hh\\:mm\\:ss");
-                else timeTextBlock.Text = relToTZero.ToString("hh\\:mm\\:ss");
+                }
+                else
+                {
+                    timeTextBlock.Text = relToTZero.ToString("hh\\:mm\\:ss");
+                }
             }
         }
 

@@ -4,20 +4,20 @@
              
              MouseEnter="UserControl_MouseEnter" MouseLeave="UserControl_MouseLeave" Background="Transparent" VerticalAlignment="Top">
 
-    <Grid x:Name="theStackPanel">
+    <Grid x:Name="theGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="8"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="10"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
-        <TextBlock x:Name="timeTextBlock"/>
-        <Ellipse x:Name="markerEllipse" Width="10" Height="10" Fill="SlateGray" Grid.Column="2"/>
-        <Border Width="15" BorderThickness="0,1,0,1" BorderBrush="Black" Grid.Column="4" VerticalAlignment="Center"/>
-        <TextBlock x:Name="textTextBlock" TextTrimming="CharacterEllipsis" Grid.Column="6"/>
+
+        <TextBlock x:Name="importantTextBlock" Text="!" Foreground="Red" FontWeight="Bold" Width="10" Visibility="Collapsed"/>
+        <TextBlock x:Name="timeTextBlock" Grid.Column="1"/>
+        <Ellipse x:Name="markerEllipse" Width="10" Height="10" Fill="SlateGray" Grid.Column="3"/>
+        <Border Width="15" BorderThickness="0,1,0,1" BorderBrush="Black" Grid.Column="4" VerticalAlignment="Center" Margin="10,0,10,0"/>
+        <TextBlock x:Name="textTextBlock" TextTrimming="CharacterEllipsis" Grid.Column="5"/>
     </Grid>
 </UserControl>
