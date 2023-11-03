@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:TimelineCreator.Controls"
         
-        Title="Add Item to Timeline" Width="360" Height="Auto" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" SizeToContent="Height" UseLayoutRounding="True">
+        Title="Add Item to Timeline" Width="380" Height="Auto" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" SizeToContent="Height" UseLayoutRounding="True">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -25,7 +25,7 @@
             </Grid>
 
             <TextBox x:Name="theTextBox" TextWrapping="Wrap" Height="108" MaxLines="1" Padding="4,3,4,0" Margin="0,5,0,0"/>
-            <CheckBox x:Name="importantCheckBox" Content="Mark item as important (shows a red exclamation mark)" Margin="0,5,0,0"/>
+            <CheckBox x:Name="importantCheckBox" Content="Mark item as important (shows a red exclamation mark)" Margin="0,5,0,10"/>
         </StackPanel>
 
         <Border Background="LightGray" Grid.Row="1">
@@ -35,10 +35,11 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Enter time relative to T-0" Checked="TZeroCheckBox_CheckedChanged" Unchecked="TZeroCheckBox_CheckedChanged" IsEnabled="False"/>
+                <CheckBox x:Name="tZeroCheckBox" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Time relative to T-0" Checked="TZeroCheckBox_CheckedChanged" Unchecked="TZeroCheckBox_CheckedChanged" IsEnabled="False"/>
                 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Column="1">
                     <Button x:Name="submitButton" Content="Add Item" Margin="0,0,5,0" Width="80" Click="SubmitButton_Click" IsDefault="True" FontWeight="Bold"/>
+                    <Button x:Name="deleteButton" Content="&#xE107;" FontFamily="Segoe UI Symbol" Padding="0" Margin="0,0,5,0" Click="DeleteButton_Click" Width="26" Visibility="Collapsed"/>
                     <Button Content="Cancel" IsCancel="True"/>
                 </StackPanel>
             </Grid>

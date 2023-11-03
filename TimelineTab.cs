@@ -437,12 +437,20 @@ namespace TimelineCreator
         {
             if (((Timeline)sender).SelectedItem != null)
             {
-                new ItemDialog(TimeZone, ((Timeline)sender).SelectedItem!)
+                ItemDialog dialog = new(TimeZone, ((Timeline)sender).SelectedItem!)
                 {
                     TZeroTime = TZeroTime,
                     IsTZeroMode = IsTZeroModeEnabled,
                     Owner = owner
-                }.ShowDialog();
+                };
+                
+                if (dialog.ShowDialog() == true)
+                {
+                    if (dialog.WasDeleted)
+                    {
+                        Timeline.Items.Remove(dialog.Item);
+                    }
+                }
             }
             else
             {

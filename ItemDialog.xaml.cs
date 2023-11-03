@@ -12,6 +12,8 @@ namespace TimelineCreator
         public DateTime? TZeroTime { get; set; } = null;
         public bool IsTZeroMode { get; set; } = false;
 
+        public bool WasDeleted { get; private set; } = false;
+
         private readonly bool isEditing = false;
 
 
@@ -42,6 +44,7 @@ namespace TimelineCreator
             {
                 Title = "Edit Timeline Item";
                 submitButton.Content = "Save Item";
+                deleteButton.Visibility = Visibility.Visible;
                 theTextBox.Text = Item.Text;
             }
 
@@ -126,6 +129,12 @@ namespace TimelineCreator
 
             Item.Text = theTextBox.Text;
             Item.IsImportant = importantCheckBox.IsChecked == true;
+            DialogResult = true;
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            WasDeleted = true;
             DialogResult = true;
         }
 
